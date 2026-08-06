@@ -1,0 +1,6 @@
+Model,Optimizer,Regularization,Dropout,Early Stopping,Validation Accuracy,Test Accuracy
+Baseline (SGD),SGD,None,0.0,No,0.784206,0.782805
+Best Optimizer (Adam),Adam,None,0.0,No,0.784745,0.789054
+Best Regularization (L2),Adam,L2,0.0,No,0.7943331003189087,0.7898082137107849
+Best Dropout (0.2),Adam,L2,0.2,No,0.7944408655166626,0.7887308597564697
+Final Model (Early Stopping),Adam,L2,0.2,Yes,0.7934712171554565,0.7916397452354431
