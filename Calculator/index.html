@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEO-CALC // Neo-Brutalist Scientific Calculator</title>
+  
+  <!-- Google Fonts: Space Grotesk & Space Mono & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  
+  <!-- Custom Neo-Brutalist Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="neo-canvas d-flex flex-column min-vh-100">
+
+  <!-- Background Decorative Shapes -->
+  <div class="bg-deco-circle"></div>
+  <div class="bg-deco-cross-1">✖</div>
+  <div class="bg-deco-cross-2">✦</div>
+  <div class="bg-deco-square"></div>
+
+  <!-- Header / Navigation Bar -->
+  <header class="container pt-3 pb-2">
+    <div class="neo-box bg-neo-yellow p-2 px-3 d-flex flex-wrap justify-content-between align-items-center mb-2">
+      <div class="d-flex align-items-center gap-2">
+        <div class="brand-badge bg-black text-white px-2 py-1 fw-bold fs-6">
+          <i class="bi bi-cpu-fill text-warning"></i> SCI-9000
+        </div>
+        <h1 class="h5 m-0 fw-black font-space tracking-tight text-uppercase">
+          Neo<span class="text-danger">.</span>Calc
+        </h1>
+        <span class="badge bg-neo-pink text-dark border-neo-sm d-none d-sm-inline-block fw-bold">SCIENTIFIC v2.0</span>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+        <!-- Sound Toggle -->
+        <button id="soundToggleBtn" class="btn neo-btn-sm bg-neo-cyan" title="Toggle Mechanical Audio" aria-label="Toggle Sound">
+          <i class="bi bi-volume-up-fill" id="soundIcon"></i>
+          <span class="d-none d-md-inline fw-bold ms-1" id="soundStatusText">SFX: ON</span>
+        </button>
+
+        <!-- History Drawer Button -->
+        <button class="btn neo-btn-sm bg-neo-lime" data-bs-toggle="offcanvas" data-bs-target="#historyOffcanvas" aria-label="Open History">
+          <i class="bi bi-clock-history"></i>
+          <span class="d-none d-md-inline fw-bold ms-1">HISTORY</span>
+          <span class="badge bg-black text-white ms-1" id="historyCountBadge">0</span>
+        </button>
+
+        <!-- Keyboard Shortcuts Help -->
+        <button class="btn neo-btn-sm bg-neo-purple text-white" data-bs-toggle="modal" data-bs-target="#helpModal" aria-label="Keyboard Shortcuts">
+          <i class="bi bi-keyboard-fill"></i>
+          <span class="d-none d-md-inline fw-bold ms-1">KEYS</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="container my-auto pb-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-10 col-xl-9">
+        
+        <!-- Calculator Housing Card -->
+        <div class="calculator-housing neo-card bg-neo-white p-3 p-sm-4">
+          
+          <!-- Screen Display Section -->
+          <div class="display-container neo-box bg-neo-black text-white p-3 mb-3 position-relative">
+            <!-- Screen Status Badges -->
+            <div class="d-flex justify-content-between align-items-center mb-1 text-uppercase font-jetbrains fs-7">
+              <div class="d-flex gap-2 align-items-center">
+                <!-- Angle Mode Toggle Pill -->
+                <button id="angleModeBtn" class="badge-toggle active-deg bg-neo-yellow text-dark" title="Toggle Degrees / Radians">
+                  <span id="degLabel" class="mode-tag fw-bold">DEG</span>
+                  <span class="mode-divider">/</span>
+                  <span id="radLabel" class="mode-tag opacity-50">RAD</span>
+                </button>
+
+                <!-- 2nd Mode Indicator -->
+                <span id="secondModeIndicator" class="screen-pill bg-dark text-secondary border border-secondary">2nd: OFF</span>
+
+                <!-- Memory Indicator -->
+                <span id="memoryIndicator" class="screen-pill bg-dark text-secondary border border-secondary">M: 0</span>
+              </div>
+
+              <!-- Live Expression Status / Error Message -->
+              <div class="text-end">
+                <span id="statusIndicator" class="text-neo-lime fw-bold blink-dot">● READY</span>
+              </div>
+            </div>
+
+            <!-- Formula / Expression Input Screen -->
+            <div class="expression-wrapper">
+              <div id="expressionDisplay" class="expression-text font-jetbrains text-truncate" title="Current Expression">0</div>
+            </div>
+
+            <!-- Main Computed Result Screen with Copy Action -->
+            <div class="result-wrapper d-flex justify-content-between align-items-center mt-1">
+              <button id="copyResultBtn" class="btn btn-sm copy-btn text-muted" title="Copy result to clipboard">
+                <i class="bi bi-clipboard"></i>
+              </button>
+              <div id="resultDisplay" class="result-text font-jetbrains fw-bold">0</div>
+            </div>
+          </div>
+
+          <!-- Quick Actions & Memory Bar -->
+          <div class="memory-bar d-flex flex-wrap gap-2 mb-3">
+            <button class="btn neo-btn neo-btn-mem flex-grow-1 bg-neo-gray" data-action="memory-clear" title="Memory Clear (MC)">MC</button>
+            <button class="btn neo-btn neo-btn-mem flex-grow-1 bg-neo-gray" data-action="memory-recall" title="Memory Recall (MR)">MR</button>
+            <button class="btn neo-btn neo-btn-mem flex-grow-1 bg-neo-gray" data-action="memory-add" title="Memory Add (M+)">M+</button>
+            <button class="btn neo-btn neo-btn-mem flex-grow-1 bg-neo-gray" data-action="memory-sub" title="Memory Subtract (M-)">M-</button>
+            <button id="secondToggleBtn" class="btn neo-btn neo-btn-mem flex-grow-1 bg-neo-purple text-white fw-bold" title="Toggle 2nd Scientific Functions">2nd</button>
+          </div>
+
+          <!-- Keypad Grid Layout -->
+          <div class="row g-2 g-sm-3 keypad-grid">
+
+            <!-- LEFT COLUMN: Scientific Functions -->
+            <div class="col-12 col-md-6 scientific-keys">
+              <div class="row g-2">
+                <!-- Row 1: Trig Primary / Inverse -->
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-cyan" data-fn="sin" data-inv="asin" data-key="s">
+                    <span class="fn-primary">sin</span>
+                    <span class="fn-inv d-none">sin⁻¹</span>
+                  </button>
+                </div>
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-cyan" data-fn="cos" data-inv="acos" data-key="c">
+                    <span class="fn-primary">cos</span>
+                    <span class="fn-inv d-none">cos⁻¹</span>
+                  </button>
+                </div>
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-cyan" data-fn="tan" data-inv="atan" data-key="t">
+                    <span class="fn-primary">tan</span>
+                    <span class="fn-inv d-none">tan⁻¹</span>
+                  </button>
+                </div>
+
+                <!-- Row 2: Logs & Exponents -->
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-cyan" data-fn="ln" data-inv="exp" data-key="n">
+                    <span class="fn-primary">ln</span>
+                    <span class="fn-inv d-none">eˣ</span>
+                  </button>
+                </div>
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-cyan" data-fn="log" data-inv="tenpow" data-key="l">
+                    <span class="fn-primary">log₁₀</span>
+                    <span class="fn-inv d-none">10ˣ</span>
+                  </button>
+                </div>
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-cyan" data-fn="pow" data-inv="yroot" data-key="^">
+                    <span class="fn-primary">xʸ</span>
+                    <span class="fn-inv d-none">ʸ√x</span>
+                  </button>
+                </div>
+
+                <!-- Row 3: Square / Roots & Powers -->
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-cyan" data-fn="sqrt" data-inv="sqr">
+                    <span class="fn-primary">√x</span>
+                    <span class="fn-inv d-none">x²</span>
+                  </button>
+                </div>
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-cyan" data-fn="cbrt" data-inv="cube">
+                    <span class="fn-primary">∛x</span>
+                    <span class="fn-inv d-none">x³</span>
+                  </button>
+                </div>
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-cyan" data-fn="fact" data-key="!">
+                    <span class="fn-primary">x!</span>
+                    <span class="fn-inv d-none">x!</span>
+                  </button>
+                </div>
+
+                <!-- Row 4: Constants & Utilities -->
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-yellow" data-val="π" data-key="p" title="Pi (3.14159...)">
+                    π
+                  </button>
+                </div>
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-yellow" data-val="e" data-key="e" title="Euler's Number (2.71828...)">
+                    e
+                  </button>
+                </div>
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-yellow" data-fn="abs" title="Absolute Value |x|">
+                    |x|
+                  </button>
+                </div>
+
+                <!-- Row 5: Parentheses & Inversion -->
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-yellow" data-val="(" data-key="(">(</button>
+                </div>
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-yellow" data-val=")" data-key=")">)</button>
+                </div>
+                <div class="col-4">
+                  <button class="btn neo-btn btn-sci w-100 bg-neo-yellow" data-fn="inv" title="Reciprocal (1/x)">
+                    1/x
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Standard Numeric & Operator Keys -->
+            <div class="col-12 col-md-6 standard-keys">
+              <div class="row g-2">
+                <!-- Row 1: Clear & Arithmetic Ops -->
+                <div class="col-3">
+                  <button class="btn neo-btn btn-action w-100 bg-neo-pink text-dark fw-bold" data-action="clear-all" data-key="Escape" title="Clear All (Escape)">
+                    AC
+                  </button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-action w-100 bg-neo-orange text-dark fw-bold" data-action="backspace" data-key="Backspace" title="Delete Last Character">
+                    <i class="bi bi-backspace-fill"></i>
+                  </button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-op w-100 bg-neo-lime text-dark fw-bold" data-val="%" data-key="%" title="Modulo / Percent">
+                    %
+                  </button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-op w-100 bg-neo-lime text-dark fw-bold" data-val="÷" data-key="/" title="Divide">
+                    ÷
+                  </button>
+                </div>
+
+                <!-- Row 2: 7, 8, 9, Multiply -->
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="7" data-key="7">7</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="8" data-key="8">8</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="9" data-key="9">9</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-op w-100 bg-neo-lime text-dark fw-bold" data-val="×" data-key="*" title="Multiply">
+                    ×
+                  </button>
+                </div>
+
+                <!-- Row 3: 4, 5, 6, Subtract -->
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="4" data-key="4">4</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="5" data-key="5">5</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="6" data-key="6">6</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-op w-100 bg-neo-lime text-dark fw-bold" data-val="-" data-key="-" title="Subtract">
+                    −
+                  </button>
+                </div>
+
+                <!-- Row 4: 1, 2, 3, Add -->
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="1" data-key="1">1</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="2" data-key="2">2</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="3" data-key="3">3</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-op w-100 bg-neo-lime text-dark fw-bold" data-val="+" data-key="+" title="Add">
+                    +
+                  </button>
+                </div>
+
+                <!-- Row 5: 0, Dot, Sign Toggle, Equals -->
+                <div class="col-3">
+                  <button class="btn neo-btn btn-action w-100 bg-neo-gray" data-action="toggle-sign" title="Negate (+/-)">
+                    ±
+                  </button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="0" data-key="0">0</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-num w-100 bg-white" data-val="." data-key=".">.</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn neo-btn btn-equals w-100 bg-neo-yellow text-dark fw-black font-jetbrains" data-action="evaluate" data-key="Enter" title="Calculate Result (Enter)">
+                    =
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Status Footer -->
+          <div class="calculator-footer mt-3 pt-2 d-flex flex-wrap justify-content-between align-items-center border-top-neo text-muted fs-8 font-jetbrains">
+            <span>PRESS <kbd class="neo-kbd">ENTER</kbd> TO EVALUATE</span>
+            <span class="d-none d-sm-inline">PURE JS MATH ENGINE // ZERO DEPENDENCIES</span>
+            <span>DEG/RAD: <kbd class="neo-kbd">D</kbd></span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Neo-Brutalist Offcanvas: Calculation History -->
+  <div class="offcanvas offcanvas-end neo-offcanvas" tabindex="-1" id="historyOffcanvas" aria-labelledby="historyOffcanvasLabel">
+    <div class="offcanvas-header bg-neo-lime border-bottom-neo p-3">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-clock-history fs-4"></i>
+        <h5 class="offcanvas-title fw-black font-space text-uppercase m-0" id="historyOffcanvasLabel">Calculation History</h5>
+      </div>
+      <button type="button" class="btn-close neo-close-btn" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    
+    <div class="offcanvas-body p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="fs-7 fw-bold text-muted font-jetbrains">SAVED SESSIONS (<span id="historyItemCount">0</span>)</span>
+        <button id="clearHistoryBtn" class="btn btn-sm neo-btn-sm bg-neo-pink text-dark fw-bold">
+          <i class="bi bi-trash3-fill"></i> Clear Log
+        </button>
+      </div>
+
+      <!-- History List -->
+      <div id="historyList" class="d-flex flex-column gap-2">
+        <div class="neo-box bg-white p-3 text-center text-muted font-jetbrains fs-7 empty-history-msg">
+          <i class="bi bi-calculator display-6 d-block mb-2 text-dark"></i>
+          No calculations yet.<br>Do some math to see history here!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Neo-Brutalist Modal: Keyboard Shortcuts & Features -->
+  <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content neo-card bg-neo-white border-neo p-0">
+        <div class="modal-header bg-neo-purple text-white border-bottom-neo p-3">
+          <h5 class="modal-title fw-black font-space text-uppercase" id="helpModalLabel">
+            <i class="bi bi-keyboard-fill me-2"></i> Keyboard Cheatsheet
+          </h5>
+          <button type="button" class="btn-close btn-close-white neo-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-3 p-sm-4 font-jetbrains fs-7">
+          <p class="fw-bold mb-3">Operate the calculator with your computer keyboard:</p>
+          
+          <div class="table-responsive">
+            <table class="table table-bordered border-dark m-0 neo-table align-middle">
+              <thead class="bg-neo-yellow">
+                <tr>
+                  <th style="width: 40%">Key</th>
+                  <th>Function</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><kbd class="neo-kbd">0</kbd> - <kbd class="neo-kbd">9</kbd></td><td>Insert Numbers</td></tr>
+                <tr><td><kbd class="neo-kbd">+</kbd> <kbd class="neo-kbd">-</kbd> <kbd class="neo-kbd">*</kbd> <kbd class="neo-kbd">/</kbd> <kbd class="neo-kbd">%</kbd></td><td>Basic Math Operators (+, −, ×, ÷, %)</td></tr>
+                <tr><td><kbd class="neo-kbd">Enter</kbd> or <kbd class="neo-kbd">=</kbd></td><td>Calculate Equation (=)</td></tr>
+                <tr><td><kbd class="neo-kbd">Backspace</kbd></td><td>Delete Last Character</td></tr>
+                <tr><td><kbd class="neo-kbd">Escape</kbd></td><td>All Clear (AC)</td></tr>
+                <tr><td><kbd class="neo-kbd">(</kbd> <kbd class="neo-kbd">)</kbd></td><td>Parentheses grouping</td></tr>
+                <tr><td><kbd class="neo-kbd">^</kbd></td><td>Exponentiation (Power)</td></tr>
+                <tr><td><kbd class="neo-kbd">s</kbd> / <kbd class="neo-kbd">c</kbd> / <kbd class="neo-kbd">t</kbd></td><td>Trigonometry (sin / cos / tan)</td></tr>
+                <tr><td><kbd class="neo-kbd">l</kbd> / <kbd class="neo-kbd">n</kbd></td><td>Log base 10 / Natural Log (ln)</td></tr>
+                <tr><td><kbd class="neo-kbd">p</kbd> / <kbd class="neo-kbd">e</kbd></td><td>Constants (π / e)</td></tr>
+                <tr><td><kbd class="neo-kbd">!</kbd></td><td>Factorial (x!)</td></tr>
+                <tr><td><kbd class="neo-kbd">d</kbd></td><td>Toggle DEG / RAD mode</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer bg-neo-gray border-top-neo p-2">
+          <button type="button" class="btn neo-btn-sm bg-neo-yellow fw-bold w-100" data-bs-dismiss="modal">GOT IT!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 1100;">
+    <div id="neoToast" class="toast neo-box bg-neo-yellow text-dark border-neo" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex align-items-center p-2">
+        <i class="bi bi-check-circle-fill fs-5 me-2 text-dark"></i>
+        <div class="toast-body p-0 fw-bold font-jetbrains fs-7" id="toastMessage">
+          Copied to clipboard!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Custom Scientific Calculator JS -->
+  <script src="script.js"></script>
+</body>
+</html>
