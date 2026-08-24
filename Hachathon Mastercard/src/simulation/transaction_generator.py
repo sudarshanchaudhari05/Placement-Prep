@@ -213,27 +213,27 @@ class TransactionGenerator:
             tx_country = profile["customer_country"]
 
         # Risk & Deviation Scores with Archetype-Specific Shifts
-        base_ip = float(self.rng.beta(2.5, 4.5))
-        ip_risk = clip_score(base_ip + params.get("ip_risk_shift", 0.30))
+        base_ip = float(self.rng.beta(1.5, 8.5))
+        ip_risk = clip_score(base_ip + params.get("ip_risk_shift", 0.0))
 
         base_merchant_risk = CATEGORY_BASE_RISK[category]
-        merchant_risk = clip_score(base_merchant_risk + params.get("merchant_risk_shift", 0.20) + float(self.rng.normal(0, 0.05)))
+        merchant_risk = clip_score(base_merchant_risk + params.get("merchant_risk_shift", 0.0) + float(self.rng.normal(0, 0.04)))
 
-        base_behavioral = float(self.rng.beta(2.5, 4.0))
-        behavioral_dev = clip_score(base_behavioral + params.get("behavioral_dev_shift", 0.30))
+        base_behavioral = float(self.rng.beta(1.4, 7.5))
+        behavioral_dev = clip_score(base_behavioral + params.get("behavioral_dev_shift", 0.0))
 
-        base_id_risk = float(self.rng.beta(2.0, 5.0))
-        identity_risk = clip_score(base_id_risk + params.get("identity_risk_shift", 0.20))
+        base_id_risk = float(self.rng.beta(1.2, 8.5))
+        identity_risk = clip_score(base_id_risk + params.get("identity_risk_shift", 0.0))
 
         # Velocity Shifts
-        v1h = int(1 + self.rng.poisson(0.5) + params.get("velocity_1h_boost", 0))
-        v24h = int(v1h + self.rng.poisson(2.0) + params.get("velocity_24h_boost", 1))
+        v1h = int(1 + self.rng.poisson(0.15) + params.get("velocity_1h_boost", 0))
+        v24h = int(v1h + self.rng.poisson(1.2) + params.get("velocity_24h_boost", 0))
 
         # Failed Auth Count
         if "failed_auth_count" in params:
             failed_auth = int(params["failed_auth_count"])
         else:
-            failed_auth = int(self.rng.choice([0, 1, 2, 3], p=[0.60, 0.25, 0.10, 0.05]))
+            failed_auth = int(self.rng.choice([0, 1, 2], p=[0.90, 0.08, 0.02]))
 
         return {
             "transaction_amount": amount,
@@ -340,7 +340,7 @@ def main():
     parser.add_argument("--n_samples", type=int, default=10000, help="Total number of transactions to generate")
     parser.add_argument("--fraud_ratio", type=float, default=0.15, help="Proportion of fraudulent transactions (0.0 - 1.0)")
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED, help="Random seed for reproducibility")
-    parser.add_argument("--output", type=str, default=str(GENERATED_DATA_DIR / "synthetic_transactions_10k.csv"), help="Output CSV path")
+    parser.add_argument("--output", type=str, default=str(GENERATED_DATA_DIR / "synthetic_transactions_v1.csv"), help="Output CSV path")
     args = parser.parse_args()
 
     print("=" * 70)

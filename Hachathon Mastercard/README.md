@@ -140,32 +140,62 @@ pip install -r requirements.txt
 ### 2. Generate Synthetic Dataset
 ```bash
 # Generate 10,000 transactions with 15% fraud ratio (deterministic seed=42)
-python -m src.simulation.transaction_generator --n_samples 10000 --fraud_ratio 0.15 --seed 42 --output data/generated/synthetic_transactions_10k.csv
+python -m src.simulation.transaction_generator --n_samples 10000 --fraud_ratio 0.15 --seed 42 --output data/generated/synthetic_transactions_v1.csv
 ```
 
-### 3. Run Test Suite
+### 3. Train Baseline XGBoost Detector
 ```bash
-pytest
+# Train baseline detector on synthetic dataset with stratified split
+python -m src.detection.train --data data/generated/synthetic_transactions_v1.csv --model_type xgboost
+```
+
+### 4. Evaluate Detector & Attack Vulnerabilities
+```bash
+# Evaluate global classification metrics and per-attack detection rates on held-out test split
+python -m src.detection.evaluate
+```
+
+### 5. Run Closed-Loop Adaptive Red-Team Experiment
+```bash
+# Run end-to-end 3-dataset closed loop: generate, mutate weak attacks, retrain, and evaluate on unseen attacks
+python -m src.adversarial.feedback_loop --n_samples 10000 --fraud_ratio 0.15 --mutation_intensity 0.65
+```
+
+### 6. Run Automated Test Suite
+```bash
+pytest -v
 ```
 
 ---
 
-## 📈 Phase 1 Validation & Statistical Properties
+## 🔁 Adaptive Red-Team / Blue-Team Benchmark (Unseen Adversarial Attacks)
 
-Validation run on **10,000 samples** (`seed=42`, `fraud_ratio=0.15`):
+Evaluated on **Dataset C (2,000 unseen transactions: 1,700 legitimate, 300 unseen mutated attacks; seed=1337)**:
 
-| Metric | Legitimate (8,500 rows) | Fraudulent (1,500 rows) | Invariant Status |
+### Before vs. After Hardening Performance
+
+| Metric | Baseline Detector | Hardened Detector | Improvement (Delta) |
 | :--- | :---: | :---: | :---: |
-| **Mean Amount** | $79.52 | $802.31 | ✅ Passed (> 0, non-negative) |
-| **Mean IP Risk Score** | 0.1494 | 0.6961 | ✅ Passed (0.0 – 1.0) |
-| **Mean Merchant Risk** | 0.1642 | 0.6649 | ✅ Passed (0.0 – 1.0) |
-| **Mean Behavioral Dev** | 0.1554 | 0.7128 | ✅ Passed (0.0 – 1.0) |
-| **Mean Identity Risk** | 0.1238 | 0.5276 | ✅ Passed (0.0 – 1.0) |
-| **Device Change Rate** | 3.85% | 75.20% | ✅ Passed (binary 0/1) |
-| **Mean 1h Velocity** | 1.15 | 2.36 | ✅ Passed ($\text{v24h} \ge \text{v1h}$) |
-| **Missing / Null Values**| 0 | 0 | ✅ Zero NaNs across all 22 cols |
-| **Duplicates** | 0 | 0 | ✅ Zero duplicates |
-| **Attack Vector Count** | 1 (`LEGITIMATE`) | 28 Archetypes | ✅ 100% label alignment |
+| **Accuracy** | 97.25% | **99.05%** | **+1.80%** |
+| **Precision** | **98.42%** | 97.63% | -0.79% |
+| **Adversarial Recall** | 83.00% | **96.00%** | **+13.00%** |
+| **F1 Score** | 0.9005 | **0.9681** | **+0.0675** |
+| **ROC-AUC** | 0.9957 | **0.9991** | **+0.0034** |
+| **False Positive Rate** | **0.24%** | 0.41% | +0.18% |
+| **Missed Attacks (FN)** | 51 missed | **12 missed** | **-39 (-76.5% reduction)** |
+
+### Attack-Specific Detection Improvements on Unseen Attacks
+
+| Vulnerable Attack Archetype | Baseline Detection | Hardened Detection | Improvement |
+| :--- | :---: | :---: | :---: |
+| **Automated Cart-State Desynchronization (`ATK-020`)** | 18.2% | **100.0%** | **+81.8%** |
+| **Generative Identity Fabrication (`ATK-006`)** | 36.4% | **100.0%** | **+63.6%** |
+| **Synthetic Subscription Layering (`ATK-027`)** | 10.0% | **70.0%** | **+60.0%** |
+| **Omnichannel Fast Checkout Bypass (`ATK-024`)** | 0.0% | **40.0%** | **+40.0%** |
+| **Velocity-Throttled Account Draining (`ATK-015`)** | 63.6% | **100.0%** | **+36.4%** |
+| **Dynamic Merchant Category Hopping (`ATK-016`)** | 54.5% | **81.8%** | **+27.3%** |
+| **Adversarial Perturbation Evasion (`ATK-021`)** | 70.0% | **90.0%** | **+20.0%** |
+| **Autonomous Session Token Harvesting (`ATK-011`)** | 81.8% | **100.0%** | **+18.2%** |
 
 ---
 
@@ -175,11 +205,13 @@ Validation run on **10,000 samples** (`seed=42`, `fraud_ratio=0.15`):
   - Attack intelligence library (28 archetypes)
   - Synthetic transaction generator with correlated features
   - Validation engine & automated unit test suite
-- [ ] **Phase 2: Baseline ML Detector & Attack-Specific Evaluation**
-  - Preprocessing and feature engineering pipeline
-  - XGBoost / Random Forest baseline classifier
-  - Granular per-attack detection rate & false negative analytics
-- [ ] **Phase 3: Adaptive Red-Team Loop & Model Hardening**
-  - False-negative detection analyzer
-  - Adversarial parameter mutator
-  - Closed-loop retraining and before/after defense comparison
+- [x] **Phase 2: Baseline ML Detector & Attack-Specific Evaluation**
+  - Preprocessing and feature engineering pipeline (`FraudFeaturePipeline`)
+  - XGBoost baseline classifier trainer (`src/detection/train.py`)
+  - Scoring & inference engine (`src/detection/predict.py`)
+  - Granular per-attack detection rate & false negative analytics (`src/detection/evaluate.py`)
+- [x] **Phase 3: Adaptive Red-Team Loop & Model Hardening**
+  - False-negative detection analyzer & feature dependency extractor
+  - Targeted, multi-strategy attack mutator (`AttackMutator`)
+  - 3-Dataset closed-loop orchestration (`Dataset A`, `Dataset B`, `Dataset C`)
+  - Retrained hardened model with 76.5% reduction in adversarial misses (`src/adversarial/feedback_loop.py`)

@@ -1,0 +1,81 @@
+{
+  "seeds": {
+    "baseline_dataset_a": 42,
+    "adversarial_train_dataset_b": 101,
+    "unseen_test_dataset_c": 1337
+  },
+  "sample_counts": {
+    "dataset_a_total": 10000,
+    "dataset_a_train": 8000,
+    "dataset_a_test": 2000,
+    "dataset_b_adversarial_train": 2500,
+    "dataset_c_unseen_test": 2000
+  },
+  "detector_feature_dependencies": [
+    "device_change",
+    "merchant_risk_score",
+    "transaction_velocity_24h",
+    "IP_risk_score"
+  ],
+  "normal_test_set_performance": {
+    "baseline_detector": {
+      "accuracy": 0.9965,
+      "precision": 0.9867109634551495,
+      "recall": 0.99,
+      "f1_score": 0.9883527454242929,
+      "roc_auc": 0.9999254901960785,
+      "false_positive_rate": 0.002352941176470588,
+      "true_negatives": 1696,
+      "false_positives": 4,
+      "false_negatives": 3,
+      "true_positives": 297,
+      "total_evaluated": 2000
+    },
+    "hardened_detector": {
+      "accuracy": 0.997,
+      "precision": 0.9803921568627451,
+      "recall": 1.0,
+      "f1_score": 0.9900990099009901,
+      "roc_auc": 0.9999490196078432,
+      "false_positive_rate": 0.0035294117647058825,
+      "true_negatives": 1694,
+      "false_positives": 6,
+      "false_negatives": 0,
+      "true_positives": 300,
+      "total_evaluated": 2000
+    }
+  },
+  "unseen_adversarial_test_performance": {
+    "baseline_detector": {
+      "accuracy": 0.9725,
+      "precision": 0.9841897233201581,
+      "recall": 0.83,
+      "f1_score": 0.9005424954792043,
+      "roc_auc": 0.995686274509804,
+      "false_positive_rate": 0.002352941176470588,
+      "true_negatives": 1696,
+      "false_positives": 4,
+      "false_negatives": 51,
+      "true_positives": 249,
+      "total_evaluated": 2000
+    },
+    "hardened_detector": {
+      "accuracy": 0.9905,
+      "precision": 0.976271186440678,
+      "recall": 0.96,
+      "f1_score": 0.9680672268907563,
+      "roc_auc": 0.9990549019607843,
+      "false_positive_rate": 0.00411764705882353,
+      "true_negatives": 1693,
+      "false_positives": 7,
+      "false_negatives": 12,
+      "true_positives": 288,
+      "total_evaluated": 2000
+    }
+  },
+  "adversarial_false_negatives": {
+    "baseline_detector_misses": 51,
+    "hardened_detector_misses": 12,
+    "miss_reduction": 39
+  }
+}
