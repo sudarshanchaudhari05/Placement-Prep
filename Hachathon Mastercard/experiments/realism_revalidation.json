@@ -1,0 +1,225 @@
+{
+  "phase": "Phase 4B \u2014 Synthetic Payment Realism & Full Experiment Revalidation",
+  "data_realism_comparison": {
+    "device_change": {
+      "before_realism": {
+        "legit_mean": 0.0375,
+        "fraud_mean": 0.7575,
+        "cohen_d": 2.172,
+        "ks_statistic": 0.72,
+        "status": "VERY_STRONG_SEPARATION"
+      },
+      "after_realism": {
+        "legit_mean": 0.1551,
+        "fraud_mean": 0.5253,
+        "cohen_d": 0.849,
+        "ks_statistic": 0.37,
+        "status": "REALISTIC_OVERLAP"
+      }
+    },
+    "merchant_risk_score": {
+      "before_realism": {
+        "legit_mean": 0.163,
+        "fraud_mean": 0.5166,
+        "cohen_d": 1.858,
+        "ks_statistic": 0.709,
+        "status": "VERY_STRONG_SEPARATION"
+      },
+      "after_realism": {
+        "legit_mean": 0.1659,
+        "fraud_mean": 0.4431,
+        "cohen_d": 1.355,
+        "ks_statistic": 0.543,
+        "status": "MODERATE_SEPARATION"
+      }
+    },
+    "transaction_amount": {
+      "before_realism": {
+        "legit_mean": 79.43,
+        "fraud_mean": 803.96,
+        "cohen_d": 1.257,
+        "ks_statistic": 0.596,
+        "status": "MODERATE_SEPARATION"
+      },
+      "after_realism": {
+        "legit_mean": 92.47,
+        "fraud_mean": 230.08,
+        "cohen_d": 0.73,
+        "ks_statistic": 0.307,
+        "status": "REALISTIC_OVERLAP"
+      }
+    },
+    "amount_deviation": {
+      "before_realism": {
+        "legit_mean": 0.236,
+        "fraud_mean": 14.655,
+        "cohen_d": 0.899,
+        "ks_statistic": 0.655,
+        "status": "MODERATE_SEPARATION"
+      },
+      "after_realism": {
+        "legit_mean": 0.481,
+        "fraud_mean": 3.433,
+        "cohen_d": 0.583,
+        "ks_statistic": 0.317,
+        "status": "REALISTIC_OVERLAP"
+      }
+    }
+  },
+  "baseline_detector_normal_performance": {
+    "before_realism": {
+      "accuracy": 0.9965,
+      "precision": 0.9867,
+      "recall": 0.99,
+      "f1_score": 0.9884,
+      "roc_auc": 0.9999,
+      "false_positive_rate": 0.0024
+    },
+    "after_realism": {
+      "accuracy": 0.9865,
+      "precision": 0.9475,
+      "recall": 0.9633,
+      "f1_score": 0.9554,
+      "roc_auc": 0.9972,
+      "false_positive_rate": 0.0094
+    }
+  },
+  "unseen_adversarial_performance": {
+    "before_realism": {
+      "baseline_detector": {
+        "accuracy": 0.9725,
+        "precision": 0.9842,
+        "recall": 0.83,
+        "f1_score": 0.9005,
+        "roc_auc": 0.9957,
+        "false_positive_rate": 0.0024,
+        "missed_attacks": 51
+      },
+      "hardened_detector": {
+        "accuracy": 0.9905,
+        "precision": 0.9763,
+        "recall": 0.96,
+        "f1_score": 0.9681,
+        "roc_auc": 0.9991,
+        "false_positive_rate": 0.0041,
+        "missed_attacks": 12
+      },
+      "adversarial_recall_gain": 0.13,
+      "miss_reduction": 39
+    },
+    "after_realism": {
+      "baseline_detector": {
+        "accuracy": 0.944,
+        "precision": 0.9273,
+        "recall": 0.68,
+        "f1_score": 0.7846,
+        "roc_auc": 0.979,
+        "false_positive_rate": 0.0094,
+        "missed_attacks": 96
+      },
+      "hardened_detector": {
+        "accuracy": 0.9705,
+        "precision": 0.9085,
+        "recall": 0.8933,
+        "f1_score": 0.9008,
+        "roc_auc": 0.9885,
+        "false_positive_rate": 0.0159,
+        "missed_attacks": 32
+      },
+      "adversarial_recall_gain": 0.2133,
+      "miss_reduction": 64
+    }
+  },
+  "top_feature_importances_after_realism": [
+    {
+      "feature": "merchant_risk_score",
+      "importance": 0.1243
+    },
+    {
+      "feature": "transaction_velocity_1h",
+      "importance": 0.0742
+    },
+    {
+      "feature": "geographic_deviation",
+      "importance": 0.0679
+    },
+    {
+      "feature": "transaction_velocity_24h",
+      "importance": 0.0666
+    },
+    {
+      "feature": "behavioral_deviation",
+      "importance": 0.0528
+    },
+    {
+      "feature": "IP_risk_score",
+      "importance": 0.0487
+    },
+    {
+      "feature": "payment_channel_pos_chip",
+      "importance": 0.0482
+    },
+    {
+      "feature": "identity_risk_score",
+      "importance": 0.0447
+    },
+    {
+      "feature": "device_age_days",
+      "importance": 0.0444
+    },
+    {
+      "feature": "payment_channel_pos_contactless",
+      "importance": 0.0414
+    }
+  ],
+  "weakest_attacks_comparison": [
+    {
+      "attack_type": "Omnichannel Fast Checkout Bypass (POS to Web)",
+      "baseline_detection": "0.0%",
+      "hardened_detection": "0.0%",
+      "delta": "+0.0%"
+    },
+    {
+      "attack_type": "Adversarial Perturbation Evasion on Risk Engine",
+      "baseline_detection": "10.0%",
+      "hardened_detection": "40.0%",
+      "delta": "+30.0%"
+    },
+    {
+      "attack_type": "Stealth Biometric Hash Injection / Virtual Sensor",
+      "baseline_detection": "18.2%",
+      "hardened_detection": "81.8%",
+      "delta": "+63.6%"
+    },
+    {
+      "attack_type": "Deepfake Live Face Swap on NFC Contactless Terminal",
+      "baseline_detection": "20.0%",
+      "hardened_detection": "60.0%",
+      "delta": "+40.0%"
+    },
+    {
+      "attack_type": "Conversational Phishing Agent (AI Romance Scam)",
+      "baseline_detection": "27.3%",
+      "hardened_detection": "100.0%",
+      "delta": "+72.7%"
+    },
+    {
+      "attack_type": "Velocity-Throttled Automated Account Draining",
+      "baseline_detection": "27.3%",
+      "hardened_detection": "72.7%",
+      "delta": "+45.5%"
+    },
+    {
+      "attack_type": "Deepfake Family Emergency Push Payment",
+      "baseline_detection": "36.4%",
+      "hardened_detection": "90.9%",
+      "delta": "+54.5%"
+    },
+    {
+      "attack_type": "Automated Cart-State Desynchronization & Discount",
+      "baseline_detection": "45.5%",
+      "hardened_detection": "100.0%",
+      "delta": "+54.5%"
+    }
+  ]
+}

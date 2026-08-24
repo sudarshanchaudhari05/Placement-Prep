@@ -1,0 +1,14 @@
+{
+  "total_input_features": 20,
+  "total_transformed_features": 65,
+  "leakage_tokens_tested": [
+    "attack_type",
+    "attack_id",
+    "fraud_label",
+    "decision",
+    "label"
+  ],
+  "leakage_detected": false,
+  "leakage_violations": [],
+  "status": "PASS - Zero Target Leakage"
+}

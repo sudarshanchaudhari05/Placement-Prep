@@ -1,0 +1,290 @@
+{
+  "target_leakage_audit": {
+    "total_input_features": 20,
+    "total_transformed_features": 65,
+    "leakage_tokens_tested": [
+      "attack_type",
+      "attack_id",
+      "fraud_label",
+      "decision",
+      "label"
+    ],
+    "leakage_detected": false,
+    "leakage_violations": [],
+    "status": "PASS - Zero Target Leakage"
+  },
+  "generator_realism_analysis": {
+    "total_numerical_features_analyzed": 15,
+    "artificially_strong_cues": [],
+    "feature_separation_rankings": [
+      {
+        "feature": "merchant_risk_score",
+        "legit_mean": 0.1657,
+        "fraud_mean": 0.4415,
+        "cohen_d": 1.344,
+        "ks_statistic": 0.54,
+        "assessment": "MODERATE_SEPARATION"
+      },
+      {
+        "feature": "device_age_days",
+        "legit_mean": 140.6732,
+        "fraud_mean": 70.6842,
+        "cohen_d": 0.474,
+        "ks_statistic": 0.468,
+        "assessment": "MODERATE_SEPARATION"
+      },
+      {
+        "feature": "transaction_velocity_24h",
+        "legit_mean": 2.3815,
+        "fraud_mean": 5.7208,
+        "cohen_d": 0.941,
+        "ks_statistic": 0.404,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "behavioral_deviation",
+        "legit_mean": 0.1603,
+        "fraud_mean": 0.3286,
+        "cohen_d": 0.933,
+        "ks_statistic": 0.379,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "device_change",
+        "legit_mean": 0.1574,
+        "fraud_mean": 0.5325,
+        "cohen_d": 0.859,
+        "ks_statistic": 0.375,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "geographic_deviation",
+        "legit_mean": 0.0443,
+        "fraud_mean": 0.38,
+        "cohen_d": 0.901,
+        "ks_statistic": 0.336,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "amount_deviation",
+        "legit_mean": 0.467,
+        "fraud_mean": 3.4504,
+        "cohen_d": 0.584,
+        "ks_statistic": 0.322,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "transaction_amount",
+        "legit_mean": 92.1534,
+        "fraud_mean": 230.6558,
+        "cohen_d": 0.732,
+        "ks_statistic": 0.305,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "IP_risk_score",
+        "legit_mean": 0.1504,
+        "fraud_mean": 0.3231,
+        "cohen_d": 0.853,
+        "ks_statistic": 0.303,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "transaction_velocity_1h",
+        "legit_mean": 1.1529,
+        "fraud_mean": 2.0108,
+        "cohen_d": 0.72,
+        "ks_statistic": 0.244,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "transaction_hour",
+        "legit_mean": 13.5319,
+        "fraud_mean": 11.0567,
+        "cohen_d": 0.411,
+        "ks_statistic": 0.228,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "identity_risk_score",
+        "legit_mean": 0.1242,
+        "fraud_mean": 0.205,
+        "cohen_d": 0.482,
+        "ks_statistic": 0.149,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "failed_authentication_count",
+        "legit_mean": 0.0306,
+        "fraud_mean": 0.2533,
+        "cohen_d": 0.455,
+        "ks_statistic": 0.142,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "account_age_days",
+        "legit_mean": 363.2038,
+        "fraud_mean": 330.6167,
+        "cohen_d": 0.096,
+        "ks_statistic": 0.075,
+        "assessment": "REALISTIC_OVERLAP"
+      },
+      {
+        "feature": "average_customer_amount",
+        "legit_mean": 74.5269,
+        "fraud_mean": 75.7474,
+        "cohen_d": 0.023,
+        "ks_statistic": 0.027,
+        "assessment": "REALISTIC_OVERLAP"
+      }
+    ]
+  },
+  "model_architecture_comparison": {
+    "xgboost": {
+      "model_type": "xgboost",
+      "feature_count": 65,
+      "normal_test": {
+        "accuracy": 0.9865,
+        "precision": 0.9475409836065574,
+        "recall": 0.9633333333333334,
+        "f1_score": 0.9553719008264463,
+        "roc_auc": 0.9974901960784314,
+        "false_positive_rate": 0.009411764705882352,
+        "true_negatives": 1684,
+        "false_positives": 16,
+        "false_negatives": 11,
+        "true_positives": 289,
+        "total_evaluated": 2000
+      },
+      "adversarial_test": {
+        "accuracy": 0.944,
+        "precision": 0.9272727272727272,
+        "recall": 0.68,
+        "f1_score": 0.7846153846153846,
+        "roc_auc": 0.9790019607843137,
+        "false_positive_rate": 0.009411764705882352,
+        "true_negatives": 1684,
+        "false_positives": 16,
+        "false_negatives": 96,
+        "true_positives": 204,
+        "total_evaluated": 2000
+      }
+    },
+    "random_forest": {
+      "model_type": "random_forest",
+      "feature_count": 65,
+      "normal_test": {
+        "accuracy": 0.985,
+        "precision": 0.9470198675496688,
+        "recall": 0.9533333333333334,
+        "f1_score": 0.9501661129568106,
+        "roc_auc": 0.9971,
+        "false_positive_rate": 0.009411764705882352,
+        "true_negatives": 1684,
+        "false_positives": 16,
+        "false_negatives": 14,
+        "true_positives": 286,
+        "total_evaluated": 2000
+      },
+      "adversarial_test": {
+        "accuracy": 0.9555,
+        "precision": 0.9306122448979591,
+        "recall": 0.76,
+        "f1_score": 0.8366972477064221,
+        "roc_auc": 0.9805411764705882,
+        "false_positive_rate": 0.01,
+        "true_negatives": 1683,
+        "false_positives": 17,
+        "false_negatives": 72,
+        "true_positives": 228,
+        "total_evaluated": 2000
+      }
+    }
+  },
+  "feature_ablation_summary": [
+    {
+      "model": "XGBOOST",
+      "ablation_setting": "All Features",
+      "num_features": 65,
+      "normal_accuracy": 0.9865,
+      "normal_f1": 0.9553719008264463,
+      "normal_recall": 0.9633333333333334,
+      "normal_fpr": 0.009411764705882352,
+      "adversarial_accuracy": 0.944,
+      "adversarial_f1": 0.7846153846153846,
+      "adversarial_recall": 0.68,
+      "adversarial_fpr": 0.009411764705882352,
+      "adversarial_misses": 96
+    },
+    {
+      "model": "XGBOOST",
+      "ablation_setting": "Without device_change",
+      "num_features": 64,
+      "normal_accuracy": 0.987,
+      "normal_f1": 0.9572368421052632,
+      "normal_recall": 0.97,
+      "normal_fpr": 0.01,
+      "adversarial_accuracy": 0.9445,
+      "adversarial_f1": 0.7861271676300579,
+      "adversarial_recall": 0.68,
+      "adversarial_fpr": 0.008823529411764706,
+      "adversarial_misses": 96
+    },
+    {
+      "model": "XGBOOST",
+      "ablation_setting": "Without Top-3 Risk Signals",
+      "num_features": 62,
+      "normal_accuracy": 0.98,
+      "normal_f1": 0.9342105263157895,
+      "normal_recall": 0.9466666666666667,
+      "normal_fpr": 0.01411764705882353,
+      "adversarial_accuracy": 0.938,
+      "adversarial_f1": 0.7606177606177607,
+      "adversarial_recall": 0.6566666666666666,
+      "adversarial_fpr": 0.012352941176470587,
+      "adversarial_misses": 103
+    },
+    {
+      "model": "RANDOM_FOREST",
+      "ablation_setting": "All Features",
+      "num_features": 65,
+      "normal_accuracy": 0.985,
+      "normal_f1": 0.9501661129568106,
+      "normal_recall": 0.9533333333333334,
+      "normal_fpr": 0.009411764705882352,
+      "adversarial_accuracy": 0.9555,
+      "adversarial_f1": 0.8366972477064221,
+      "adversarial_recall": 0.76,
+      "adversarial_fpr": 0.01,
+      "adversarial_misses": 72
+    },
+    {
+      "model": "RANDOM_FOREST",
+      "ablation_setting": "Without device_change",
+      "num_features": 64,
+      "normal_accuracy": 0.984,
+      "normal_f1": 0.946843853820598,
+      "normal_recall": 0.95,
+      "normal_fpr": 0.01,
+      "adversarial_accuracy": 0.9525,
+      "adversarial_f1": 0.822429906542056,
+      "adversarial_recall": 0.7333333333333333,
+      "adversarial_fpr": 0.008823529411764706,
+      "adversarial_misses": 80
+    },
+    {
+      "model": "RANDOM_FOREST",
+      "ablation_setting": "Without Top-3 Risk Signals",
+      "num_features": 62,
+      "normal_accuracy": 0.9745,
+      "normal_f1": 0.9170731707317074,
+      "normal_recall": 0.94,
+      "normal_fpr": 0.019411764705882354,
+      "adversarial_accuracy": 0.9465,
+      "adversarial_f1": 0.8022181146025879,
+      "adversarial_recall": 0.7233333333333334,
+      "adversarial_fpr": 0.01411764705882353,
+      "adversarial_misses": 83
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "total_numerical_features_analyzed": 15,
+  "artificially_strong_cues": [],
+  "feature_separation_rankings": [
+    {
+      "feature": "merchant_risk_score",
+      "legit_mean": 0.1657,
+      "fraud_mean": 0.4415,
+      "cohen_d": 1.344,
+      "ks_statistic": 0.54,
+      "assessment": "MODERATE_SEPARATION"
+    },
+    {
+      "feature": "device_age_days",
+      "legit_mean": 140.6732,
+      "fraud_mean": 70.6842,
+      "cohen_d": 0.474,
+      "ks_statistic": 0.468,
+      "assessment": "MODERATE_SEPARATION"
+    },
+    {
+      "feature": "transaction_velocity_24h",
+      "legit_mean": 2.3815,
+      "fraud_mean": 5.7208,
+      "cohen_d": 0.941,
+      "ks_statistic": 0.404,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "behavioral_deviation",
+      "legit_mean": 0.1603,
+      "fraud_mean": 0.3286,
+      "cohen_d": 0.933,
+      "ks_statistic": 0.379,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "device_change",
+      "legit_mean": 0.1574,
+      "fraud_mean": 0.5325,
+      "cohen_d": 0.859,
+      "ks_statistic": 0.375,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "geographic_deviation",
+      "legit_mean": 0.0443,
+      "fraud_mean": 0.38,
+      "cohen_d": 0.901,
+      "ks_statistic": 0.336,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "amount_deviation",
+      "legit_mean": 0.467,
+      "fraud_mean": 3.4504,
+      "cohen_d": 0.584,
+      "ks_statistic": 0.322,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "transaction_amount",
+      "legit_mean": 92.1534,
+      "fraud_mean": 230.6558,
+      "cohen_d": 0.732,
+      "ks_statistic": 0.305,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "IP_risk_score",
+      "legit_mean": 0.1504,
+      "fraud_mean": 0.3231,
+      "cohen_d": 0.853,
+      "ks_statistic": 0.303,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "transaction_velocity_1h",
+      "legit_mean": 1.1529,
+      "fraud_mean": 2.0108,
+      "cohen_d": 0.72,
+      "ks_statistic": 0.244,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "transaction_hour",
+      "legit_mean": 13.5319,
+      "fraud_mean": 11.0567,
+      "cohen_d": 0.411,
+      "ks_statistic": 0.228,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "identity_risk_score",
+      "legit_mean": 0.1242,
+      "fraud_mean": 0.205,
+      "cohen_d": 0.482,
+      "ks_statistic": 0.149,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "failed_authentication_count",
+      "legit_mean": 0.0306,
+      "fraud_mean": 0.2533,
+      "cohen_d": 0.455,
+      "ks_statistic": 0.142,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "account_age_days",
+      "legit_mean": 363.2038,
+      "fraud_mean": 330.6167,
+      "cohen_d": 0.096,
+      "ks_statistic": 0.075,
+      "assessment": "REALISTIC_OVERLAP"
+    },
+    {
+      "feature": "average_customer_amount",
+      "legit_mean": 74.5269,
+      "fraud_mean": 75.7474,
+      "cohen_d": 0.023,
+      "ks_statistic": 0.027,
+      "assessment": "REALISTIC_OVERLAP"
+    }
+  ]
+}

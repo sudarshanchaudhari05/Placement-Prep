@@ -161,41 +161,68 @@ python -m src.detection.evaluate
 python -m src.adversarial.feedback_loop --n_samples 10000 --fraud_ratio 0.15 --mutation_intensity 0.65
 ```
 
-### 6. Run Automated Test Suite
+### 6. Run Robustness Benchmarks & Feature Ablation Experiments
+```bash
+# Execute model architecture comparisons (XGBoost vs Random Forest) and feature ablation studies
+python -m src.detection.benchmarks
+```
+
+### 7. Run Automated Test Suite
 ```bash
 pytest -v
 ```
 
 ---
 
-## 🔁 Adaptive Red-Team / Blue-Team Benchmark (Unseen Adversarial Attacks)
+## 🔬 Robustness & Model Benchmarking (Phase 4 / 4B)
 
-Evaluated on **Dataset C (2,000 unseen transactions: 1,700 legitimate, 300 unseen mutated attacks; seed=1337)**:
+### 1. Synthetic Payment Realism Upgrade (Phase 4B)
 
-### Before vs. After Hardening Performance
+We calibrated the synthetic generator distributions to eliminate artificial separation cues:
+
+| Feature | Pre-Realism Separation | Post-Realism Separation | Status |
+| :--- | :---: | :---: | :---: |
+| **`device_change`** | Legit: 3.75% \| Fraud: 75.75% ($d = 2.172, KS = 0.720$) | Legit: **15.51%** \| Fraud: **52.53%** ($d = 0.849, KS = 0.370$) | ✅ **Realistic Overlap** |
+| **`merchant_risk_score`** | Legit: 0.1630 \| Fraud: 0.5166 ($d = 1.858, KS = 0.709$) | Legit: **0.1659** \| Fraud: **0.4431** ($d = 1.355, KS = 0.543$) | ✅ **Moderate Separation** |
+| **`transaction_amount`** | Legit: $79.43 \| Fraud: $803.96 ($d = 1.257, KS = 0.596$) | Legit: **$92.47** \| Fraud: **$230.08** ($d = 0.730, KS = 0.307$) | ✅ **Realistic Overlap** |
+| **`amount_deviation`** | Legit: 0.2360 \| Fraud: 14.65 ($d = 0.899, KS = 0.655$) | Legit: **0.4807** \| Fraud: **3.4327** ($d = 0.583, KS = 0.317$) | ✅ **Realistic Overlap** |
+
+### 2. Model Architecture Comparison (Realistic Dataset)
+
+Both models evaluated on identical stratified splits (Dataset A normal test & Dataset C unseen adversarial test):
+
+| Model | Normal F1 | Normal Recall | Adversarial Recall (Dataset C) | Adversarial F1 | Adversarial Misses |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **XGBoost (Full Features)** | **0.9554** | **96.33%** | 68.00% | 0.7846 | 96 missed |
+| **Random Forest (Full Features)** | 0.9502 | 94.67% | **76.00%** | **0.8352** | **72 missed** |
+
+### 3. Adaptive Red-Team Hardening on Realistic Data
 
 | Metric | Baseline Detector | Hardened Detector | Improvement (Delta) |
 | :--- | :---: | :---: | :---: |
-| **Accuracy** | 97.25% | **99.05%** | **+1.80%** |
-| **Precision** | **98.42%** | 97.63% | -0.79% |
-| **Adversarial Recall** | 83.00% | **96.00%** | **+13.00%** |
-| **F1 Score** | 0.9005 | **0.9681** | **+0.0675** |
-| **ROC-AUC** | 0.9957 | **0.9991** | **+0.0034** |
-| **False Positive Rate** | **0.24%** | 0.41% | +0.18% |
-| **Missed Attacks (FN)** | 51 missed | **12 missed** | **-39 (-76.5% reduction)** |
+| **Accuracy** | 94.40% | **97.05%** | **+2.65%** |
+| **Precision** | **92.73%** | 90.85% | -1.88% |
+| **Adversarial Recall** | 68.00% | **89.33%** | **+21.33%** |
+| **F1 Score** | 0.7846 | **0.9008** | **+0.1162** |
+| **ROC-AUC** | 0.9790 | **0.9885** | **+0.0095** |
+| **False Positive Rate** | **0.94%** | 1.59% | +0.65% |
+| **Missed Attacks (FN)** | 96 missed | **32 missed** | **-64 (-66.7% reduction)** |
 
-### Attack-Specific Detection Improvements on Unseen Attacks
+### 4. Balanced Feature Importance (Zero Dominating Cue)
 
-| Vulnerable Attack Archetype | Baseline Detection | Hardened Detection | Improvement |
-| :--- | :---: | :---: | :---: |
-| **Automated Cart-State Desynchronization (`ATK-020`)** | 18.2% | **100.0%** | **+81.8%** |
-| **Generative Identity Fabrication (`ATK-006`)** | 36.4% | **100.0%** | **+63.6%** |
-| **Synthetic Subscription Layering (`ATK-027`)** | 10.0% | **70.0%** | **+60.0%** |
-| **Omnichannel Fast Checkout Bypass (`ATK-024`)** | 0.0% | **40.0%** | **+40.0%** |
-| **Velocity-Throttled Account Draining (`ATK-015`)** | 63.6% | **100.0%** | **+36.4%** |
-| **Dynamic Merchant Category Hopping (`ATK-016`)** | 54.5% | **81.8%** | **+27.3%** |
-| **Adversarial Perturbation Evasion (`ATK-021`)** | 70.0% | **90.0%** | **+20.0%** |
-| **Autonomous Session Token Harvesting (`ATK-011`)** | 81.8% | **100.0%** | **+18.2%** |
+Top 10 features utilized by the detector after realism calibration:
+1. `merchant_risk_score` (12.43%)
+2. `transaction_velocity_1h` (7.42%)
+3. `geographic_deviation` (6.79%)
+4. `transaction_velocity_24h` (6.66%)
+5. `behavioral_deviation` (5.28%)
+6. `IP_risk_score` (4.87%)
+7. `payment_channel_pos_chip` (4.82%)
+8. `identity_risk_score` (4.47%)
+9. `device_age_days` (4.44%)
+10. `payment_channel_pos_contactless` (4.14%)
+
+*(Note: `device_change` dropped from 59.17% down to < 4%, forcing the model to learn genuine multi-feature behavioral interactions).*
 
 ---
 
@@ -215,3 +242,8 @@ Evaluated on **Dataset C (2,000 unseen transactions: 1,700 legitimate, 300 unsee
   - Targeted, multi-strategy attack mutator (`AttackMutator`)
   - 3-Dataset closed-loop orchestration (`Dataset A`, `Dataset B`, `Dataset C`)
   - Retrained hardened model with 76.5% reduction in adversarial misses (`src/adversarial/feedback_loop.py`)
+- [x] **Phase 4 & 4B: Robustness Benchmarks, Data Realism & Full Revalidation**
+  - Calibrated synthetic distributions (device change, merchant risk, amount tails)
+  - XGBoost vs. Random Forest architectural benchmark
+  - Feature ablation studies and automated target leakage audit
+  - Retrained and revalidated closed-loop feedback experiment (`experiments/realism_revalidation.json`)

@@ -69,6 +69,22 @@ LEGITIMATE_CATEGORY_WEIGHTS: Dict[str, float] = {
     "crypto_exchange": 0.005,
 }
 
+# Category frequency distribution for fraudulent transactions (broad, realistic spread across everyday merchants)
+FRAUD_CATEGORY_WEIGHTS: Dict[str, float] = {
+    "retail": 0.22,
+    "digital_goods": 0.18,
+    "groceries": 0.14,
+    "marketplace": 0.12,
+    "dining": 0.10,
+    "electronics": 0.08,
+    "gaming": 0.05,
+    "travel": 0.04,
+    "money_transfer": 0.03,
+    "utilities": 0.02,
+    "luxury": 0.015,
+    "crypto_exchange": 0.005,
+}
+
 # Payment channel distribution for legitimate transactions
 LEGITIMATE_CHANNEL_WEIGHTS: Dict[str, float] = {
     "pos_contactless": 0.32,

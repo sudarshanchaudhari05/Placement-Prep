@@ -17,6 +17,7 @@ from src.simulation.distributions import (
     CATEGORY_BASE_RISK,
     CATEGORY_AMOUNT_PARAMS,
     LEGITIMATE_CATEGORY_WEIGHTS,
+    FRAUD_CATEGORY_WEIGHTS,
     LEGITIMATE_CHANNEL_WEIGHTS,
     LEGITIMATE_AUTH_WEIGHTS,
     COUNTRY_WEIGHTS,
@@ -75,13 +76,19 @@ class TransactionGenerator:
         # Diurnal Hour
         hour = int(self.rng.choice(24, p=HOURLY_ACTIVITY_PROB))
 
-        # Amount conditioned on customer baseline and category typical scale
+        # Amount conditioned on customer baseline and category typical scale with heavy-tail events
         cat_mean, cat_sigma = CATEGORY_AMOUNT_PARAMS[category]
         cat_baseline = np.exp(cat_mean)
         blend_factor = 0.65
         expected_amount = (blend_factor * profile["average_customer_amount"]) + ((1.0 - blend_factor) * cat_baseline)
-        amount_factor = np.exp(self.rng.normal(0.0, 0.35))
-        amount = float(np.round(np.clip(expected_amount * amount_factor, 1.0, 5000.0), 2))
+        
+        # ~6% of legitimate transactions are large purchases (e.g. travel, gifts, electronics, large groceries)
+        is_high_ticket = self.rng.random() < 0.06
+        if is_high_ticket:
+            amount_factor = np.exp(self.rng.normal(1.2, 0.45))
+        else:
+            amount_factor = np.exp(self.rng.normal(0.0, 0.38))
+        amount = float(np.round(np.clip(expected_amount * amount_factor, 1.5, 3500.0), 2))
 
         # Amount deviation relative to customer's historical average
         amount_dev = float(np.round((amount - profile["average_customer_amount"]) / profile["average_customer_amount"], 4))
@@ -96,9 +103,14 @@ class TransactionGenerator:
             tx_country = profile["customer_country"]
             geo_dev = 0
 
-        # Device change (rare for normal users: ~4%)
-        device_change = int(self.rng.random() < 0.04)
-        device_age = 1 if device_change else profile["device_age_days"]
+        # Realistic probabilistic device change for legitimate users: ~15% baseline
+        p_device_change = 0.14
+        if channel in ["e-commerce", "mobile_app"]:
+            p_device_change += 0.03
+        if profile["account_age_days"] < 90:
+            p_device_change += 0.03
+        device_change = int(self.rng.random() < p_device_change)
+        device_age = int(self.rng.integers(1, min(profile["account_age_days"] + 1, 30))) if device_change else profile["device_age_days"]
 
         # Risk Scores (Beta distributions skewed low for benign transactions)
         ip_risk = clip_score(float(self.rng.beta(1.5, 8.5)))
@@ -152,8 +164,12 @@ class TransactionGenerator:
         profile = customer_profile or self._sample_customer_profile()
         params = archetype.simulation_parameters
 
-        # Base transaction defaults
-        category = params.get("merchant_category") or sample_categorical(LEGITIMATE_CATEGORY_WEIGHTS, self.rng)
+        # Base transaction defaults (blend archetype preferred category with everyday fraud categories)
+        if "merchant_category" in params and self.rng.random() < 0.50:
+            category = params["merchant_category"]
+        else:
+            category = sample_categorical(FRAUD_CATEGORY_WEIGHTS, self.rng)
+
         channel = params.get("payment_channel") or archetype.affected_payment_surface
         auth_method = params.get("auth_method_override") or sample_categorical(LEGITIMATE_AUTH_WEIGHTS, self.rng)
 
@@ -165,12 +181,18 @@ class TransactionGenerator:
             low, high = params["account_age_range"]
             account_age = int(self.rng.integers(low, high + 1))
 
-        device_change = params.get("device_change", int(self.rng.random() < 0.65))
+        # Probabilistic device change in fraud: ~45% overall (preserves meaningful fraction of device_change = 0)
+        if "device_change" in params:
+            p_dc = 0.70 if params["device_change"] == 1 else 0.15
+            device_change = int(self.rng.random() < p_dc)
+        else:
+            device_change = int(self.rng.random() < 0.45)
+
         device_age = profile["device_age_days"]
         if "device_age_max" in params:
             device_age = int(self.rng.integers(1, params["device_age_max"] + 1))
         elif device_change == 1:
-            device_age = int(self.rng.integers(1, 10))
+            device_age = int(self.rng.integers(1, 15))
 
         # Hour Distribution
         hour_dist = params.get("hour_distribution", "any")
@@ -181,23 +203,24 @@ class TransactionGenerator:
         elif hour_dist == "business_hours":
             hour = int(self.rng.integers(9, 18))
         else:
-            # Slights shift towards odd hours for general attacks
             hour = int(self.rng.integers(0, 24))
 
-        # Transaction Amount Calculation
+        # Transaction Amount Calculation (Realistic scaling)
         if "fixed_amount_range" in params:
             low, high = params["fixed_amount_range"]
             amount = float(np.round(self.rng.uniform(low, high), 2))
         elif "amount_multiplier" in params:
             low_mult, high_mult = params["amount_multiplier"]
-            mult = self.rng.uniform(low_mult, high_mult)
-            base_ref = max(profile["average_customer_amount"], np.exp(CATEGORY_AMOUNT_PARAMS[category][0]))
+            scaled_low = max(0.9, low_mult * 0.55)
+            scaled_high = max(1.2, high_mult * 0.55)
+            mult = self.rng.uniform(scaled_low, scaled_high)
+            base_ref = (0.5 * profile["average_customer_amount"]) + (0.5 * np.exp(CATEGORY_AMOUNT_PARAMS[category][0]))
             amount = float(np.round(base_ref * mult, 2))
         else:
             cat_mean, _ = CATEGORY_AMOUNT_PARAMS[category]
-            amount = float(np.round(np.exp(cat_mean) * self.rng.uniform(1.8, 4.0), 2))
+            amount = float(np.round(np.exp(cat_mean) * self.rng.uniform(1.1, 2.4), 2))
 
-        amount = max(0.5, amount)
+        amount = max(1.0, min(amount, 3500.0))
         amount_dev = float(np.round((amount - profile["average_customer_amount"]) / profile["average_customer_amount"], 4))
 
         # Geographic Deviation

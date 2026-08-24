@@ -1,30 +1,30 @@
 attack_type,is_fraud,total_samples,baseline_caught,baseline_missed,baseline_detection_rate,hardened_caught,hardened_missed,hardened_detection_rate,detection_rate_delta
-Omnichannel Fast Checkout Bypass (POS to Web Arbitrage),True,10,0,10,0.0,4,6,40.0,40.0
-Synthetic Subscription Layering & Chargeback Cycling,True,10,1,9,10.0,7,3,70.0,60.0
-Automated Cart-State Desynchronization & Discount Exploit,True,11,2,9,18.18,11,0,100.0,81.82
-Generative Identity Fabrication (Franken-Identity),True,11,4,7,36.36,11,0,100.0,63.64
-Dynamic Merchant Category Hopping Bot,True,11,6,5,54.55,9,2,81.82,27.27
-Velocity-Throttled Automated Account Draining,True,11,7,4,63.64,11,0,100.0,36.36
-Adversarial Perturbation Evasion on Risk Scoring Engine,True,10,7,3,70.0,9,1,90.0,20.0
-Autonomous Session Token Harvesting & Replay,True,11,9,2,81.82,11,0,100.0,18.18
-LLM-Orchestrated Adaptive Credential Stuffing,True,11,10,1,90.91,11,0,100.0,9.09
-Diffusion Document Forgery (Statement Manipulation),True,11,10,1,90.91,11,0,100.0,9.09
-Automated AI Customer Support / Refund Phishing,True,11,11,0,100.0,11,0,100.0,0.0
-Agentic Webhook Signature Evasion & Race Exploit,True,11,11,0,100.0,11,0,100.0,0.0
-AI-Routed Residential Proxy Swarm Geolocation Spoofing,True,10,10,0,100.0,10,0,100.0,0.0
-AI-Generated RMA & Fake Tracking Return Fraud,True,10,10,0,100.0,10,0,100.0,0.0
-AI SIM-Swap + Automated OTP Exfiltration,True,10,10,0,100.0,10,0,100.0,0.0
-AI Smurfing & Micro-Structuring Network,True,11,11,0,100.0,11,0,100.0,0.0
+Omnichannel Fast Checkout Bypass (POS to Web Arbitrage),True,10,0,10,0.0,0,10,0.0,0.0
+Adversarial Perturbation Evasion on Risk Scoring Engine,True,10,1,9,10.0,4,6,40.0,30.0
+Stealth Biometric Hash Injection / Virtual Sensor Replay,True,11,2,9,18.18,9,2,81.82,63.64
+Deepfake Live Face Swap on NFC Contactless Terminal,True,10,2,8,20.0,6,4,60.0,40.0
+Conversational Phishing Agent (AI Romance / Trust Scam),True,11,3,8,27.27,11,0,100.0,72.73
+Velocity-Throttled Automated Account Draining,True,11,3,8,27.27,8,3,72.73,45.46
+Deepfake Family Emergency Push Payment,True,11,4,7,36.36,10,1,90.91,54.55
+Automated Cart-State Desynchronization & Discount Exploit,True,11,5,6,45.45,11,0,100.0,54.55
+AI SIM-Swap + Automated OTP Exfiltration,True,10,6,4,60.0,7,3,70.0,10.0
+Voice Clone Executive Impersonation (CEO Fraud / APP),True,11,7,4,63.64,11,0,100.0,36.36
+Autonomous Session Token Harvesting & Replay,True,11,7,4,63.64,11,0,100.0,36.36
+AI-Routed Residential Proxy Swarm Geolocation Spoofing,True,10,7,3,70.0,9,1,90.0,20.0
+Blended Minor Identity Sleeper Fraud,True,11,8,3,72.73,10,1,90.91,18.18
+Automated AI Customer Support / Refund Phishing,True,11,8,3,72.73,11,0,100.0,27.27
+AI-Generated RMA & Fake Tracking Return Fraud,True,10,8,2,80.0,10,0,100.0,20.0
+Synthetic Subscription Layering & Chargeback Cycling,True,10,8,2,80.0,10,0,100.0,20.0
+Malicious MCP / Plugin Tool Unauthorized Transaction,True,11,9,2,81.82,11,0,100.0,18.18
+LLM-Orchestrated Adaptive Credential Stuffing,True,11,9,2,81.82,11,0,100.0,18.18
+AI Smurfing & Micro-Structuring Network,True,11,10,1,90.91,11,0,100.0,9.09
+Dynamic Merchant Category Hopping Bot,True,11,10,1,90.91,10,1,90.91,0.0
+Diffusion Document Forgery (Statement Manipulation),True,11,11,0,100.0,11,0,100.0,0.0
 Deepfake Video KYC Onboarding Bypass,True,11,11,0,100.0,11,0,100.0,0.0
-Deepfake Live Face Swap on NFC Contactless Terminal,True,10,10,0,100.0,10,0,100.0,0.0
-Deepfake Family Emergency Push Payment,True,11,11,0,100.0,11,0,100.0,0.0
-Conversational Phishing Agent (AI Romance / Trust Scam),True,11,11,0,100.0,11,0,100.0,0.0
 Autonomous Shopping Agent Prompt Hijack,True,11,11,0,100.0,11,0,100.0,0.0
-Blended Minor Identity Sleeper Fraud,True,11,11,0,100.0,11,0,100.0,0.0
-Human Typing & Mouse Cadence Behavioral Mimicry,True,11,11,0,100.0,11,0,100.0,0.0
-Low-and-Slow AI Micro-Carding Swarm,True,11,11,0,100.0,11,0,100.0,0.0
+Agentic Webhook Signature Evasion & Race Exploit,True,11,11,0,100.0,11,0,100.0,0.0
 Multi-Currency Triangular Arbitrage Money Laundering,True,10,10,0,100.0,10,0,100.0,0.0
-Malicious MCP / Plugin Tool Unauthorized Transaction,True,11,11,0,100.0,11,0,100.0,0.0
-Stealth Biometric Hash Injection / Virtual Sensor Replay,True,11,11,0,100.0,11,0,100.0,0.0
-Voice Clone Executive Impersonation (CEO Fraud / APP),True,11,11,0,100.0,11,0,100.0,0.0
-LEGITIMATE,False,1700,1696,4,99.76,1693,7,99.59,-0.17
+Low-and-Slow AI Micro-Carding Swarm,True,11,11,0,100.0,11,0,100.0,0.0
+Generative Identity Fabrication (Franken-Identity),True,11,11,0,100.0,11,0,100.0,0.0
+Human Typing & Mouse Cadence Behavioral Mimicry,True,11,11,0,100.0,11,0,100.0,0.0
+LEGITIMATE,False,1700,1684,16,99.06,1673,27,98.41,-0.65

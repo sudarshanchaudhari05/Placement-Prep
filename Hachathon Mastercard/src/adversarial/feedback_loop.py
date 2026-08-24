@@ -83,6 +83,16 @@ class AdaptiveFeedbackLoop:
         save_detector(artifact_baseline, baseline_model_path)
         detector_baseline = FraudDetector(artifact=artifact_baseline)
 
+        # Save Dataset A and splits
+        gen_a_path = GENERATED_DATA_DIR / "synthetic_transactions_v1.csv"
+        train_a_path = PROCESSED_DATA_DIR / "train_split.csv"
+        test_a_path = PROCESSED_DATA_DIR / "test_split.csv"
+        GENERATED_DATA_DIR.mkdir(parents=True, exist_ok=True)
+        PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
+        df_a.to_csv(gen_a_path, index=False)
+        train_df_a.to_csv(train_a_path, index=False)
+        test_df_a.to_csv(test_a_path, index=False)
+
         print(f"    [+] Baseline model trained on {len(train_df_a):,} samples.")
         print(f"    [+] Saved baseline detector to {baseline_model_path}")
 

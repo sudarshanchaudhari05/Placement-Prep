@@ -96,6 +96,29 @@ def test_distribution_divergence_between_fraud_and_legit():
     assert fraud["identity_risk_score"].mean() > legit["identity_risk_score"].mean()
 
 
+def test_realistic_feature_overlap_and_bounds():
+    """Verify realistic distribution properties and non-extreme separation."""
+    generator = TransactionGenerator(seed=42)
+    df = generator.generate_dataset(n_samples=5000, fraud_ratio=0.20)
+
+    legit = df[df["fraud_label"] == 0]
+    fraud = df[df["fraud_label"] == 1]
+
+    # Legitimate device change rate should be realistic (~10% - 25%)
+    legit_dc_rate = legit["device_change"].mean()
+    assert 0.10 <= legit_dc_rate <= 0.25
+
+    # Fraud device change rate should leave substantial device_change == 0 (~35% - 65%)
+    fraud_dc_rate = fraud["device_change"].mean()
+    assert 0.35 <= fraud_dc_rate <= 0.65
+
+    # Legitimate users should occasionally make high-ticket purchases (> $500)
+    assert (legit["transaction_amount"] > 500).any()
+
+    # Fraud includes micro / normal carding transactions (< $25)
+    assert (fraud["transaction_amount"] < 25).any()
+
+
 def test_validate_dataset_method():
     """Test built-in validate_dataset static utility."""
     generator = TransactionGenerator(seed=42)
