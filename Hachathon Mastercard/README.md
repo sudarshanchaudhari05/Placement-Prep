@@ -137,37 +137,25 @@ cd fraudforge-ai
 pip install -r requirements.txt
 ```
 
-### 2. Generate Synthetic Dataset
+### 2. Run Complete Closed-Loop Experiment (Single Entry Point)
+Run the entire **IDENTIFY → GENERATE → DEFEND → ATTACK → LEARN → HARDEN → TEST** pipeline with a single command:
 ```bash
-# Generate 10,000 transactions with 15% fraud ratio (deterministic seed=42)
-python -m src.simulation.transaction_generator --n_samples 10000 --fraud_ratio 0.15 --seed 42 --output data/generated/synthetic_transactions_v1.csv
+python run_experiment.py
+```
+This automatically generates the synthetic environment, trains the baseline detector, identifies vulnerable attack archetypes, mutates attacks adaptively, retrains the hardened model, and benchmarks before/after defense against unseen adversarial attacks.
+
+*Optional configuration flags:*
+```bash
+python run_experiment.py --samples 10000 --fraud-ratio 0.15 --mutation-intensity 0.65
 ```
 
-### 3. Train Baseline XGBoost Detector
-```bash
-# Train baseline detector on synthetic dataset with stratified split
-python -m src.detection.train --data data/generated/synthetic_transactions_v1.csv --model_type xgboost
-```
-
-### 4. Evaluate Detector & Attack Vulnerabilities
-```bash
-# Evaluate global classification metrics and per-attack detection rates on held-out test split
-python -m src.detection.evaluate
-```
-
-### 5. Run Closed-Loop Adaptive Red-Team Experiment
-```bash
-# Run end-to-end 3-dataset closed loop: generate, mutate weak attacks, retrain, and evaluate on unseen attacks
-python -m src.adversarial.feedback_loop --n_samples 10000 --fraud_ratio 0.15 --mutation_intensity 0.65
-```
-
-### 6. Run Robustness Benchmarks & Feature Ablation Experiments
+### 3. Run Robustness Benchmarks & Feature Ablation Experiments
 ```bash
 # Execute model architecture comparisons (XGBoost vs Random Forest) and feature ablation studies
 python -m src.detection.benchmarks
 ```
 
-### 7. Run Automated Test Suite
+### 4. Run Automated Test Suite
 ```bash
 pytest -v
 ```

@@ -13,7 +13,7 @@ Orchestrates the closed-loop adversarial feedback cycle:
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Dict, Any, List, Tuple, Optional, Callable
 import numpy as np
 import pandas as pd
 
@@ -59,19 +59,27 @@ class AdaptiveFeedbackLoop:
         n_samples: int = 10000,
         fraud_ratio: float = 0.15,
         mutation_intensity: float = 0.65,
+        verbose: bool = True,
+        step_callback: Optional[Callable[[int, str], None]] = None,
     ) -> Dict[str, Any]:
         """Execute full closed-loop experiment across Datasets A, B, and C."""
 
-        print("=" * 80)
-        print("    FRAUDFORGE AI -- CLOSED-LOOP ADAPTIVE RED TEAM / BLUE TEAM EXPERIMENT")
-        print("=" * 80)
+        if verbose:
+            print("=" * 80)
+            print("    FRAUDFORGE AI -- CLOSED-LOOP ADAPTIVE RED TEAM / BLUE TEAM EXPERIMENT")
+            print("=" * 80)
 
-        # ---------------------------------------------------------------------
-        # STEP 1: Generate Dataset A (Baseline Dataset) & Split
-        # ---------------------------------------------------------------------
-        print("\n[*] STEP 1: Generating Dataset A (Baseline Training & Held-Out Test Set)...")
+        if step_callback:
+            step_callback(1, "Generating synthetic payment environment...")
+        elif verbose:
+            print("\n[*] STEP 1: Generating Dataset A (Baseline Training & Held-Out Test Set)...")
         gen_a = TransactionGenerator(seed=self.baseline_seed)
         df_a = gen_a.generate_dataset(n_samples=n_samples, fraud_ratio=fraud_ratio)
+
+        if step_callback:
+            step_callback(2, "Training baseline fraud detector...")
+        elif verbose:
+            print("\n[*] STEP 2: Training Baseline Fraud Detector...")
 
         artifact_baseline, train_df_a, test_df_a = train_baseline_detector(
             df=df_a,
@@ -93,13 +101,17 @@ class AdaptiveFeedbackLoop:
         train_df_a.to_csv(train_a_path, index=False)
         test_df_a.to_csv(test_a_path, index=False)
 
-        print(f"    [+] Baseline model trained on {len(train_df_a):,} samples.")
-        print(f"    [+] Saved baseline detector to {baseline_model_path}")
+        if verbose:
+            print(f"    [+] Baseline model trained on {len(train_df_a):,} samples.")
+            print(f"    [+] Saved baseline detector to {baseline_model_path}")
 
         # ---------------------------------------------------------------------
-        # STEP 2: Evaluate Baseline Detector & Identify Vulnerabilities
+        # STEP 3: Evaluate Baseline Detector & Identify Vulnerabilities
         # ---------------------------------------------------------------------
-        print("\n[*] STEP 2: Evaluating Baseline Detector on Held-Out Test Set A...")
+        if step_callback:
+            step_callback(3, "Identifying detector weaknesses...")
+        elif verbose:
+            print("\n[*] STEP 3: Evaluating Baseline Detector on Held-Out Test Set A...")
         y_true_a = test_df_a["fraud_label"].to_numpy()
         y_pred_a_base = detector_baseline.predict(test_df_a)
         y_prob_a_base = detector_baseline.predict_proba(test_df_a)
@@ -108,18 +120,14 @@ class AdaptiveFeedbackLoop:
         baseline_attack_eval = evaluate_attack_specific_metrics(test_df_a, detector_baseline)
         weakest_attacks = get_weakest_attacks(baseline_attack_eval, bottom_n=5)
 
-        print(f"    [+] Baseline Normal Test F1: {baseline_normal_metrics['f1_score']:.4f} | Recall: {baseline_normal_metrics['recall']:.4f}")
-        print(f"    [!] Identified Weakest Attack Archetypes:")
-        for _, row in weakest_attacks.iterrows():
-            print(f"        • {row['attack_type']}: {row['detection_rate']}% detection ({int(row['missed'])} missed)")
+        if verbose:
+            print(f"    [+] Baseline Normal Test F1: {baseline_normal_metrics['f1_score']:.4f} | Recall: {baseline_normal_metrics['recall']:.4f}")
+            print(f"    [!] Identified Weakest Attack Archetypes:")
+            for _, row in weakest_attacks.iterrows():
+                print(f"        • {row['attack_type']}: {row['detection_rate']}% detection ({int(row['missed'])} missed)")
 
-        # ---------------------------------------------------------------------
-        # STEP 3: Analyze Detector Feature Importance
-        # ---------------------------------------------------------------------
-        print("\n[*] STEP 3: Analyzing Baseline Detector Feature Dependencies...")
         feat_imp_df = detector_baseline.get_feature_importances(top_n=15)
         top_weakness_features = feat_imp_df.head(6)["feature"].tolist()
-        # Clean one-hot prefixes for mutator
         clean_features = []
         for f in top_weakness_features:
             for base_feat in ["device_change", "merchant_risk_score", "IP_risk_score", "transaction_velocity_24h", "transaction_velocity_1h", "behavioral_deviation", "amount_deviation"]:
@@ -128,17 +136,20 @@ class AdaptiveFeedbackLoop:
         if not clean_features:
             clean_features = ["device_change", "merchant_risk_score", "IP_risk_score", "behavioral_deviation"]
 
-        print(f"    [+] Top Relied-Upon Features by Detector: {clean_features}")
         feat_imp_path = self.output_dir / "feature_importance.csv"
         feat_imp_df.to_csv(feat_imp_path, index=False)
-        print(f"    [+] Exported feature importances to {feat_imp_path}")
+        if verbose:
+            print(f"    [+] Top Relied-Upon Features by Detector: {clean_features}")
+            print(f"    [+] Exported feature importances to {feat_imp_path}")
 
         # ---------------------------------------------------------------------
         # STEP 4: Generate Dataset B (Adversarial Training Set via AttackMutator)
         # ---------------------------------------------------------------------
-        print("\n[*] STEP 4: Generating Dataset B (Adversarial Training Set)...")
+        if step_callback:
+            step_callback(4, "Generating adaptive adversarial attacks...")
+        elif verbose:
+            print("\n[*] STEP 4: Generating Dataset B (Adversarial Training Set)...")
         gen_b = TransactionGenerator(seed=self.adversarial_train_seed)
-        # Generate adversarial batch focusing on attacks
         df_b_raw = gen_b.generate_dataset(n_samples=2500, fraud_ratio=0.50)
         df_b_fraud = df_b_raw[df_b_raw["fraud_label"] == 1].copy()
         df_b_legit = df_b_raw[df_b_raw["fraud_label"] == 0].copy()
@@ -154,12 +165,16 @@ class AdaptiveFeedbackLoop:
         dataset_b = pd.concat([mutated_fraud_train, df_b_legit], ignore_index=True)
         dataset_b_path = GENERATED_DATA_DIR / "adversarial_train_dataset_b.csv"
         dataset_b.to_csv(dataset_b_path, index=False)
-        print(f"    [+] Generated Dataset B: {len(dataset_b):,} samples ({len(mutated_fraud_train):,} mutated attacks).")
+        if verbose:
+            print(f"    [+] Generated Dataset B: {len(dataset_b):,} samples ({len(mutated_fraud_train):,} mutated attacks).")
 
         # ---------------------------------------------------------------------
         # STEP 5: Train Hardened Detector on Augmented Training Data (A + B)
         # ---------------------------------------------------------------------
-        print("\n[*] STEP 5: Retraining Hardened Blue-Team Detector on Augmented Data...")
+        if step_callback:
+            step_callback(5, "Training hardened detector...")
+        elif verbose:
+            print("\n[*] STEP 5: Retraining Hardened Blue-Team Detector on Augmented Data...")
         augmented_train_df = pd.concat([train_df_a, dataset_b], ignore_index=True).sample(
             frac=1.0, random_state=self.adversarial_train_seed
         ).reset_index(drop=True)
@@ -196,13 +211,17 @@ class AdaptiveFeedbackLoop:
         hardened_model_path = MODELS_DIR / "hardened_detector.joblib"
         save_detector(artifact_hardened, hardened_model_path)
         detector_hardened = FraudDetector(artifact=artifact_hardened)
-        print(f"    [+] Hardened Detector successfully trained on {len(augmented_train_df):,} total samples.")
-        print(f"    [+] Saved hardened model to {hardened_model_path}")
+        if verbose:
+            print(f"    [+] Hardened Detector successfully trained on {len(augmented_train_df):,} total samples.")
+            print(f"    [+] Saved hardened model to {hardened_model_path}")
 
         # ---------------------------------------------------------------------
-        # STEP 6: Generate Dataset C (Unseen Adversarial Test Set)
+        # STEP 6: Generate Dataset C (Unseen Adversarial Test Set) & Test
         # ---------------------------------------------------------------------
-        print("\n[*] STEP 6: Generating Dataset C (Unseen Adversarial Test Set - seed=1337)...")
+        if step_callback:
+            step_callback(6, "Testing on unseen adversarial attacks...")
+        elif verbose:
+            print("\n[*] STEP 6: Generating Dataset C (Unseen Adversarial Test Set - seed=1337)...")
         gen_c = TransactionGenerator(seed=self.unseen_test_seed)
         df_c_raw = gen_c.generate_dataset(n_samples=2000, fraud_ratio=0.15)
         df_c_fraud = df_c_raw[df_c_raw["fraud_label"] == 1].copy()
@@ -221,12 +240,14 @@ class AdaptiveFeedbackLoop:
         ).reset_index(drop=True)
         dataset_c_path = PROCESSED_DATA_DIR / "unseen_adversarial_test_c.csv"
         dataset_c.to_csv(dataset_c_path, index=False)
-        print(f"    [+] Saved Dataset C to {dataset_c_path} ({len(dataset_c):,} samples: {len(df_c_legit):,} legit, {len(mutated_fraud_test):,} unseen mutated attacks).")
+        if verbose:
+            print(f"    [+] Saved Dataset C to {dataset_c_path} ({len(dataset_c):,} samples: {len(df_c_legit):,} legit, {len(mutated_fraud_test):,} unseen mutated attacks).")
 
         # ---------------------------------------------------------------------
         # STEP 7: Side-by-Side Comparative Evaluation
         # ---------------------------------------------------------------------
-        print("\n[*] STEP 7: Performing Side-by-Side Defense Evaluation...")
+        if verbose:
+            print("\n[*] STEP 7: Performing Side-by-Side Defense Evaluation...")
 
         # 1. Evaluate on Normal Test Set A
         y_pred_a_hard = detector_hardened.predict(test_df_a)
@@ -276,7 +297,8 @@ class AdaptiveFeedbackLoop:
         comparison_df = pd.DataFrame(comparison_records)
         comparison_csv_path = self.output_dir / "adversarial_report.csv"
         comparison_df.to_csv(comparison_csv_path, index=False)
-        print(f"    [+] Saved attack comparison breakdown to {comparison_csv_path}")
+        if verbose:
+            print(f"    [+] Saved attack comparison breakdown to {comparison_csv_path}")
 
         # ---------------------------------------------------------------------
         # STEP 8: Export Complete Experiment JSON
@@ -308,23 +330,27 @@ class AdaptiveFeedbackLoop:
                 "hardened_detector_misses": hardened_adv_metrics["false_negatives"],
                 "miss_reduction": baseline_adv_metrics["false_negatives"] - hardened_adv_metrics["false_negatives"],
             },
+            "attack_comparison": comparison_df.to_dict(orient="records"),
+            "feature_importances": feat_imp_df.to_dict(orient="records"),
         }
 
         exp_json_path = self.output_dir / "baseline_vs_adversarial.json"
         with open(exp_json_path, "w", encoding="utf-8") as f:
             json.dump(experiment_summary, f, indent=2)
-        print(f"    [+] Saved full experiment summary to {exp_json_path}")
+        if verbose:
+            print(f"    [+] Saved full experiment summary to {exp_json_path}")
 
         # ---------------------------------------------------------------------
         # STEP 9: Print Comparative Report Table
         # ---------------------------------------------------------------------
-        self._print_terminal_report(
-            baseline_normal_metrics=baseline_normal_metrics,
-            hardened_normal_metrics=hardened_normal_metrics,
-            baseline_adv_metrics=baseline_adv_metrics,
-            hardened_adv_metrics=hardened_adv_metrics,
-            comparison_df=comparison_df,
-        )
+        if verbose:
+            self._print_terminal_report(
+                baseline_normal_metrics=baseline_normal_metrics,
+                hardened_normal_metrics=hardened_normal_metrics,
+                baseline_adv_metrics=baseline_adv_metrics,
+                hardened_adv_metrics=hardened_adv_metrics,
+                comparison_df=comparison_df,
+            )
 
         return experiment_summary
 

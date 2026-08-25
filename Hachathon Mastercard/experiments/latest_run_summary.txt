@@ -1,0 +1,38 @@
+======================================================================
+FRAUDFORGE AI -- LATEST EXPERIMENT RUN SUMMARY
+======================================================================
+Timestamp: 2026-08-25 02:53:03 UTC
+
+CONFIGURATION:
+  - Dataset A Samples: 10,000
+  - Train / Test Split: 8,000 train / 2,000 test
+  - Dataset B (Adversarial Train): 2,500 samples
+  - Dataset C (Unseen Adversarial Test): 2,000 samples
+  - Random Seeds: Baseline=42, Adversarial Train=101, Unseen Test=1337
+
+NORMAL HELD-OUT TEST PERFORMANCE:
+  - Baseline Detector : Accuracy: 98.65%, Precision: 94.75%, Recall: 96.33%, F1: 0.9554, FPR: 0.94%
+  - Hardened Detector : Accuracy: 97.85%, Precision: 89.30%, Recall: 97.33%, F1: 0.9314, FPR: 2.06%
+
+UNSEEN ADVERSARIAL TEST PERFORMANCE (DATASET C):
+  - Baseline Detector : Recall: 68.00%, F1: 0.7846, Missed: 96 attacks
+  - Hardened Detector : Recall: 89.33%, F1: 0.9008, Missed: 32 attacks
+
+DEFENSE GAINS & HARDENING IMPACT:
+  - Adversarial Recall Improvement : +21.33 percentage points
+  - Missed Attacks Reduction       : -64 fewer false negatives
+  - False Negative Reduction Rate  : 66.7%
+
+TOP IDENTIFIED WEAKNESSES (DATASET C):
+  - Omnichannel Fast Checkout Bypass (POS to Web Arbitrage): 0.0% -> 0.0% (Delta: +0.0%)
+  - Adversarial Perturbation Evasion on Risk Scoring Engine: 10.0% -> 40.0% (Delta: +30.0%)
+  - Stealth Biometric Hash Injection / Virtual Sensor Replay: 18.2% -> 81.8% (Delta: +63.6%)
+  - Deepfake Live Face Swap on NFC Contactless Terminal: 20.0% -> 60.0% (Delta: +40.0%)
+  - Conversational Phishing Agent (AI Romance / Trust Scam): 27.3% -> 100.0% (Delta: +72.7%)
+  - Velocity-Throttled Automated Account Draining: 27.3% -> 72.7% (Delta: +45.5%)
+  - Deepfake Family Emergency Push Payment: 36.4% -> 90.9% (Delta: +54.5%)
+  - Automated Cart-State Desynchronization & Discount Exploit: 45.5% -> 100.0% (Delta: +54.5%)
+
+TOP RELIED-UPON DETECTOR FEATURE DEPENDENCIES:
+  - merchant_risk_score, transaction_velocity_1h, transaction_velocity_24h, behavioral_deviation, IP_risk_score
+======================================================================
