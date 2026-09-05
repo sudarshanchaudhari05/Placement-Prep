@@ -1,0 +1,14 @@
+#-----------------------------------------------------------
+# Vivado v2023.1 (64-bit)
+# SW Build 3865809 on Sun May  7 15:05:29 MDT 2023
+# IP Build 3864474 on Sun May  7 20:36:21 MDT 2023
+# SharedData Build 3865790 on Sun May 07 13:33:03 MDT 2023
+# Start of session at: Sat Sep  5 15:36:55 2026
+# Process ID: 34412
+# Current directory: C:/Users/sudar/Documents/Collage/Placement prep/vivado/project_1/project_1.runs/impl_1
+# Command line: vivado.exe -log boolean_tb.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source boolean_tb.tcl -notrace
+# Log file: C:/Users/sudar/Documents/Collage/Placement prep/vivado/project_1/project_1.runs/impl_1/boolean_tb.vdi
+# Journal file: C:/Users/sudar/Documents/Collage/Placement prep/vivado/project_1/project_1.runs/impl_1\vivado.jou
+# Running On: Sudarshan, OS: Windows, CPU Frequency: 2688 MHz, CPU Physical cores: 8, Host memory: 16784 MB
+#-----------------------------------------------------------
+source boolean_tb.tcl -notrace
