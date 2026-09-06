@@ -2,3 +2,6 @@ Running: xsim.dir/boolean_tb_behav/xsimk.exe -simmode gui -wdb boolean_tb_behav.
 Design successfully loaded
 Design Loading Memory Usage: 9596 KB (Peak: 9596 KB)
 Design Loading CPU Usage: 0 ms
+Simulation completed
+Simulation Memory Usage: 10296 KB (Peak: 10296 KB)
+Simulation CPU Usage: 30 ms
