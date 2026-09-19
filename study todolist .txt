@@ -1,6 +1,14 @@
-didc study
-mlcv Homework
-EDi CV understanding
-AE Project Detsil
+mlcv homeassingment
+MATLAB sim AE
+Coursera
 
-IMP -  Petent paper
+
+
+
+
+
+
+mlcv PRACTICAL
+3D MODEL DESIGN
+
+AI_ENV\Scripts\activate
