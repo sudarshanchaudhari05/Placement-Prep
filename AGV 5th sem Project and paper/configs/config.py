@@ -101,6 +101,9 @@ class DatasetConfig:
     real_world_target_total: int = 1000
     waypoint_tolerance_px: float = 7.5
     eval_tolerance_px: float = 8.0
+    max_trajectory_attempts: int = 50
+    max_frame_attempts: int = 10
+    min_visible_anchors_trajectory: int = 3
 
 
 @dataclass

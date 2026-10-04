@@ -115,6 +115,31 @@ class SampleValidator:
         self.rejected_records.append(record)
         return False, reason
 
+    def record_geometry_rejection(
+        self,
+        ep_id: int,
+        scenario: str,
+        seed: int,
+        reason: str,
+    ) -> None:
+        """Record a candidate trajectory rejected by the geometric sanity gate."""
+        record = {
+            "episode_id": ep_id,
+            "type": "trajectory_geometry_rejection",
+            "scenario": scenario,
+            "seed": seed,
+            "rejection_reason": reason,
+        }
+        self.rejected_records.append(record)
+
+    @staticmethod
+    def is_geometry_rejection(reason: Optional[str]) -> bool:
+        """Determines whether a rejection is caused by trajectory geometry / visibility."""
+        if not reason:
+            return False
+        geometry_keywords = ["unexpectedly absent", "out-of-bounds", "visible anchors", "geometry"]
+        return any(kw in reason.lower() for kw in geometry_keywords)
+
     def save_rejected_log(self) -> None:
         """Persist rejected samples log to JSON file."""
         self.log_path.parent.mkdir(parents=True, exist_ok=True)

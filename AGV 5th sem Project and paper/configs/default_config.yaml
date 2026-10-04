@@ -75,3 +75,8 @@ dataset:
   # Labeling parameters
   waypoint_tolerance_px: 7.5 # Waypoint must fall within +/- 7.5 px of anchor row
   eval_tolerance_px: 8.0     # F1 coordinate evaluation tolerance
+
+  # Generation retry limits & sanity gate
+  max_trajectory_attempts: 50
+  max_frame_attempts: 10
+  min_visible_anchors_trajectory: 3

@@ -1,0 +1,12 @@
+{
+  "total_rejected": 1,
+  "rejected_samples": [
+    {
+      "episode_id": 22,
+      "type": "trajectory_geometry_rejection",
+      "scenario": "scenario_d_s_curve",
+      "seed": 23000,
+      "rejection_reason": "Candidate trajectory has 0 visible anchors (< 3)"
+    }
+  ]
+}

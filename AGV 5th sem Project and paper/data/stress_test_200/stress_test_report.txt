@@ -1,0 +1,51 @@
+================================================================================
+200-SAMPLE SYNTHETIC GENERATOR STRESS-TEST RESULTS
+================================================================================
+Timestamp:                 2026-10-05 00:38:22
+Overall Audit Status:      PASS
+Total Samples Generated:   200
+Split Allocation:          {'train': 140, 'val': 30, 'test': 30}
+Scenario Allocation:       {'scenario_a_nominal': 51, 'scenario_b_glare': 51, 'scenario_c_abrasion': 49, 'scenario_d_s_curve': 49}
+--------------------------------------------------------------------------------
+Throughput & Performance:
+  - Runtime:               1.79 s
+  - Average Throughput:    111.5 samples/sec
+  - Process Memory RSS:    549.5 MB (delta: +21.7 MB)
+--------------------------------------------------------------------------------
+Generator Robustness & Geometry Gate:
+  - Trajectory Gate Rejections: 1
+  - Frame Appearance Retries:   0
+  - Permanently Dropped Samples: 0
+--------------------------------------------------------------------------------
+Anchor Visibility Distribution:
+  - 0_visible                : 0
+  - 1_to_2_visible           : 5
+  - 3_to_5_visible           : 12
+  - 6_to_10_visible          : 12
+  - 11_to_17_visible         : 171
+  - 18_visible               : 0
+  - avg_visible_anchors      : 12.9
+  - min_visible_anchors      : 2
+  - max_visible_anchors      : 16
+--------------------------------------------------------------------------------
+Domain-Randomization Ranges:
+  - lighting_lux          : min=233.2, max=1492.7, mean=776.6
+  - specular_exponent     : min=16.4, max=119.7, mean=57.5
+  - diffuse_albedo        : min=0.28, max=0.701, mean=0.517
+  - camera_pitch_deg      : min=-2.33, max=1.79, mean=-0.11
+  - abrasion_loss_ratio   : min=0.003, max=0.385, mean=0.133
+--------------------------------------------------------------------------------
+Data & Split Integrity:
+  - Corrupt Files:         0 (PASS)
+  - Invalid Annotations:   0 (PASS)
+  - Duplicate Image IDs:   0 (PASS)
+  - Duplicate Paths:       0 (PASS)
+  - Scene Leakage (Tr/Val): 0 (PASS)
+  - Scene Leakage (Tr/Test): 0 (PASS)
+  - Scene Leakage (Val/Test): 0 (PASS)
+--------------------------------------------------------------------------------
+SICT Option A Pipeline Validation:
+  - Tested Frames:         20
+  - NaN/Inf Detected:      False (PASS)
+  - Pipeline Verified:     True (PASS)
+================================================================================

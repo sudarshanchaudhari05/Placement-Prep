@@ -1,0 +1,85 @@
+{
+  "title": "200-sample synthetic generator stress-test results",
+  "timestamp": "2026-10-05 00:38:22",
+  "overall_status": "PASS",
+  "total_generated": 200,
+  "split_counts": {
+    "train": 140,
+    "val": 30,
+    "test": 30
+  },
+  "scenario_counts": {
+    "scenario_a_nominal": 51,
+    "scenario_b_glare": 51,
+    "scenario_c_abrasion": 49,
+    "scenario_d_s_curve": 49
+  },
+  "performance": {
+    "total_time_seconds": 1.79,
+    "samples_per_second": 111.5,
+    "memory_before_rss_mb": 527.8,
+    "memory_after_rss_mb": 549.5,
+    "memory_delta_mb": 21.7
+  },
+  "robustness_and_geometry": {
+    "trajectory_gate_rejections": 1,
+    "frame_level_retries": 0,
+    "permanently_rejected_samples": 0,
+    "max_trajectory_attempts_used": 1
+  },
+  "visibility_distribution": {
+    "0_visible": 0,
+    "1_to_2_visible": 5,
+    "3_to_5_visible": 12,
+    "6_to_10_visible": 12,
+    "11_to_17_visible": 171,
+    "18_visible": 0,
+    "avg_visible_anchors": 12.9,
+    "min_visible_anchors": 2,
+    "max_visible_anchors": 16
+  },
+  "domain_randomization_stats": {
+    "lighting_lux": {
+      "min": 233.2,
+      "max": 1492.7,
+      "mean": 776.6
+    },
+    "specular_exponent": {
+      "min": 16.4,
+      "max": 119.7,
+      "mean": 57.5
+    },
+    "diffuse_albedo": {
+      "min": 0.28,
+      "max": 0.701,
+      "mean": 0.517
+    },
+    "camera_pitch_deg": {
+      "min": -2.33,
+      "max": 1.79,
+      "mean": -0.11
+    },
+    "abrasion_loss_ratio": {
+      "min": 0.003,
+      "max": 0.385,
+      "mean": 0.133
+    }
+  },
+  "integrity_verification": {
+    "corrupt_files_count": 0,
+    "invalid_dimensions_count": 0,
+    "invalid_annotations_count": 0,
+    "duplicate_image_ids_count": 0,
+    "duplicate_paths_count": 0,
+    "cross_split_scene_leakage": {
+      "train_val_overlap": 0,
+      "train_test_overlap": 0,
+      "val_test_overlap": 0
+    }
+  },
+  "sict_qa": {
+    "tested_samples": 20,
+    "nan_or_inf_detected": false,
+    "pipeline_passed": true
+  }
+}
