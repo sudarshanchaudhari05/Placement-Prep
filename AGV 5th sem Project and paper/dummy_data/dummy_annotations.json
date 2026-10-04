@@ -1,0 +1,983 @@
+{
+  "version": "1.0",
+  "samples": [
+    {
+      "image_path": "images/dummy_0000.png",
+      "width": 640,
+      "height": 480,
+      "roi": {
+        "y_min": 200,
+        "y_max": 470,
+        "x_min": 0,
+        "x_max": 640
+      },
+      "row_anchors": [
+        {
+          "row_idx": 0,
+          "row_y_orig": 200,
+          "u_coord": 260.0,
+          "grid_bin": 40,
+          "class_id": 40,
+          "present": true
+        },
+        {
+          "row_idx": 1,
+          "row_y_orig": 216,
+          "u_coord": 266.9459228515625,
+          "grid_bin": 41,
+          "class_id": 41,
+          "present": true
+        },
+        {
+          "row_idx": 2,
+          "row_y_orig": 232,
+          "u_coord": 273.6808166503906,
+          "grid_bin": 42,
+          "class_id": 42,
+          "present": true
+        },
+        {
+          "row_idx": 3,
+          "row_y_orig": 248,
+          "u_coord": 281.9803466796875,
+          "grid_bin": 44,
+          "class_id": 44,
+          "present": true
+        },
+        {
+          "row_idx": 4,
+          "row_y_orig": 264,
+          "u_coord": 287.4496765136719,
+          "grid_bin": 44,
+          "class_id": 44,
+          "present": true
+        },
+        {
+          "row_idx": 5,
+          "row_y_orig": 279,
+          "u_coord": 292.0849304199219,
+          "grid_bin": 45,
+          "class_id": 45,
+          "present": true
+        },
+        {
+          "row_idx": 6,
+          "row_y_orig": 295,
+          "u_coord": 295.74530029296875,
+          "grid_bin": 46,
+          "class_id": 46,
+          "present": true
+        },
+        {
+          "row_idx": 7,
+          "row_y_orig": 311,
+          "u_coord": 298.319580078125,
+          "grid_bin": 46,
+          "class_id": 46,
+          "present": true
+        },
+        {
+          "row_idx": 8,
+          "row_y_orig": 327,
+          "u_coord": 299.7295227050781,
+          "grid_bin": 46,
+          "class_id": 46,
+          "present": true
+        },
+        {
+          "row_idx": 9,
+          "row_y_orig": 343,
+          "u_coord": 299.7295227050781,
+          "grid_bin": 46,
+          "class_id": 46,
+          "present": true
+        },
+        {
+          "row_idx": 10,
+          "row_y_orig": 359,
+          "u_coord": 298.319580078125,
+          "grid_bin": 46,
+          "class_id": 46,
+          "present": true
+        },
+        {
+          "row_idx": 11,
+          "row_y_orig": 375,
+          "u_coord": 295.74530029296875,
+          "grid_bin": 46,
+          "class_id": 46,
+          "present": true
+        },
+        {
+          "row_idx": 12,
+          "row_y_orig": 391,
+          "u_coord": 292.0849304199219,
+          "grid_bin": 45,
+          "class_id": 45,
+          "present": true
+        },
+        {
+          "row_idx": 13,
+          "row_y_orig": 406,
+          "u_coord": 287.4496765136719,
+          "grid_bin": 44,
+          "class_id": 44,
+          "present": true
+        },
+        {
+          "row_idx": 14,
+          "row_y_orig": 422,
+          "u_coord": 281.9803466796875,
+          "grid_bin": 44,
+          "class_id": 44,
+          "present": true
+        },
+        {
+          "row_idx": 15,
+          "row_y_orig": 438,
+          "u_coord": 273.6808166503906,
+          "grid_bin": 42,
+          "class_id": 42,
+          "present": true
+        },
+        {
+          "row_idx": 16,
+          "row_y_orig": 454,
+          "u_coord": 266.9459228515625,
+          "grid_bin": 41,
+          "class_id": 41,
+          "present": true
+        },
+        {
+          "row_idx": 17,
+          "row_y_orig": 470,
+          "u_coord": 260.0,
+          "grid_bin": 40,
+          "class_id": 40,
+          "present": true
+        }
+      ],
+      "metadata": {
+        "is_dummy": true,
+        "purpose": "pipeline_verification_only",
+        "simulated_specular_exponent": 45.0,
+        "simulated_lighting_lux": 800.0
+      }
+    },
+    {
+      "image_path": "images/dummy_0001.png",
+      "width": 640,
+      "height": 480,
+      "roi": {
+        "y_min": 200,
+        "y_max": 470,
+        "x_min": 0,
+        "x_max": 640
+      },
+      "row_anchors": [
+        {
+          "row_idx": 0,
+          "row_y_orig": 200,
+          "u_coord": 290.0,
+          "grid_bin": 45,
+          "class_id": 45,
+          "present": true
+        },
+        {
+          "row_idx": 1,
+          "row_y_orig": 216,
+          "u_coord": 298.6824035644531,
+          "grid_bin": 46,
+          "class_id": 46,
+          "present": true
+        },
+        {
+          "row_idx": 2,
+          "row_y_orig": 232,
+          "u_coord": 307.10101318359375,
+          "grid_bin": 47,
+          "class_id": 47,
+          "present": true
+        },
+        {
+          "row_idx": 3,
+          "row_y_orig": 248,
+          "u_coord": 317.4754638671875,
+          "grid_bin": 49,
+          "class_id": 49,
+          "present": true
+        },
+        {
+          "row_idx": 4,
+          "row_y_orig": 264,
+          "u_coord": 324.31207275390625,
+          "grid_bin": 50,
+          "class_id": 50,
+          "present": true
+        },
+        {
+          "row_idx": 5,
+          "row_y_orig": 279,
+          "u_coord": 330.1061706542969,
+          "grid_bin": 51,
+          "class_id": 51,
+          "present": true
+        },
+        {
+          "row_idx": 6,
+          "row_y_orig": 295,
+          "u_coord": 334.681640625,
+          "grid_bin": 52,
+          "class_id": 52,
+          "present": true
+        },
+        {
+          "row_idx": 7,
+          "row_y_orig": 311,
+          "u_coord": 337.89947509765625,
+          "grid_bin": 52,
+          "class_id": 52,
+          "present": true
+        },
+        {
+          "row_idx": 8,
+          "row_y_orig": 327,
+          "u_coord": 339.66192626953125,
+          "grid_bin": 53,
+          "class_id": 53,
+          "present": true
+        },
+        {
+          "row_idx": 9,
+          "row_y_orig": 343,
+          "u_coord": 339.66192626953125,
+          "grid_bin": 53,
+          "class_id": 53,
+          "present": true
+        },
+        {
+          "row_idx": 10,
+          "row_y_orig": 359,
+          "u_coord": 337.89947509765625,
+          "grid_bin": 52,
+          "class_id": 52,
+          "present": true
+        },
+        {
+          "row_idx": 11,
+          "row_y_orig": 375,
+          "u_coord": 334.681640625,
+          "grid_bin": 52,
+          "class_id": 52,
+          "present": true
+        },
+        {
+          "row_idx": 12,
+          "row_y_orig": 391,
+          "u_coord": 330.1061706542969,
+          "grid_bin": 51,
+          "class_id": 51,
+          "present": true
+        },
+        {
+          "row_idx": 13,
+          "row_y_orig": 406,
+          "u_coord": 324.31207275390625,
+          "grid_bin": 50,
+          "class_id": 50,
+          "present": true
+        },
+        {
+          "row_idx": 14,
+          "row_y_orig": 422,
+          "u_coord": 317.4754638671875,
+          "grid_bin": 49,
+          "class_id": 49,
+          "present": true
+        },
+        {
+          "row_idx": 15,
+          "row_y_orig": 438,
+          "u_coord": 307.10101318359375,
+          "grid_bin": 47,
+          "class_id": 47,
+          "present": true
+        },
+        {
+          "row_idx": 16,
+          "row_y_orig": 454,
+          "u_coord": 298.6824035644531,
+          "grid_bin": 46,
+          "class_id": 46,
+          "present": true
+        },
+        {
+          "row_idx": 17,
+          "row_y_orig": 470,
+          "u_coord": 290.0,
+          "grid_bin": 45,
+          "class_id": 45,
+          "present": true
+        }
+      ],
+      "metadata": {
+        "is_dummy": true,
+        "purpose": "pipeline_verification_only",
+        "simulated_specular_exponent": 45.0,
+        "simulated_lighting_lux": 800.0
+      }
+    },
+    {
+      "image_path": "images/dummy_0002.png",
+      "width": 640,
+      "height": 480,
+      "roi": {
+        "y_min": 200,
+        "y_max": 470,
+        "x_min": 0,
+        "x_max": 640
+      },
+      "row_anchors": [
+        {
+          "row_idx": 0,
+          "row_y_orig": 200,
+          "u_coord": 320.0,
+          "grid_bin": 50,
+          "class_id": 50,
+          "present": true
+        },
+        {
+          "row_idx": 1,
+          "row_y_orig": 216,
+          "u_coord": 330.41888427734375,
+          "grid_bin": 51,
+          "class_id": 51,
+          "present": true
+        },
+        {
+          "row_idx": 2,
+          "row_y_orig": 232,
+          "u_coord": 340.5212097167969,
+          "grid_bin": 53,
+          "class_id": 53,
+          "present": true
+        },
+        {
+          "row_idx": 3,
+          "row_y_orig": 248,
+          "u_coord": 352.9705505371094,
+          "grid_bin": 55,
+          "class_id": 55,
+          "present": true
+        },
+        {
+          "row_idx": 4,
+          "row_y_orig": 264,
+          "u_coord": 361.17449951171875,
+          "grid_bin": 56,
+          "class_id": 56,
+          "present": true
+        },
+        {
+          "row_idx": 5,
+          "row_y_orig": 279,
+          "u_coord": 365.9626770019531,
+          "grid_bin": 57,
+          "class_id": 57,
+          "present": true
+        },
+        {
+          "row_idx": 6,
+          "row_y_orig": 295,
+          "u_coord": null,
+          "grid_bin": null,
+          "class_id": 100,
+          "present": false
+        },
+        {
+          "row_idx": 7,
+          "row_y_orig": 311,
+          "u_coord": null,
+          "grid_bin": null,
+          "class_id": 100,
+          "present": false
+        },
+        {
+          "row_idx": 8,
+          "row_y_orig": 327,
+          "u_coord": null,
+          "grid_bin": null,
+          "class_id": 100,
+          "present": false
+        },
+        {
+          "row_idx": 9,
+          "row_y_orig": 343,
+          "u_coord": 379.59429931640625,
+          "grid_bin": 59,
+          "class_id": 59,
+          "present": true
+        },
+        {
+          "row_idx": 10,
+          "row_y_orig": 359,
+          "u_coord": 377.4793701171875,
+          "grid_bin": 58,
+          "class_id": 58,
+          "present": true
+        },
+        {
+          "row_idx": 11,
+          "row_y_orig": 375,
+          "u_coord": 373.6179504394531,
+          "grid_bin": 58,
+          "class_id": 58,
+          "present": true
+        },
+        {
+          "row_idx": 12,
+          "row_y_orig": 391,
+          "u_coord": 368.12738037109375,
+          "grid_bin": 57,
+          "class_id": 57,
+          "present": true
+        },
+        {
+          "row_idx": 13,
+          "row_y_orig": 406,
+          "u_coord": 361.17449951171875,
+          "grid_bin": 56,
+          "class_id": 56,
+          "present": true
+        },
+        {
+          "row_idx": 14,
+          "row_y_orig": 422,
+          "u_coord": 352.9705505371094,
+          "grid_bin": 55,
+          "class_id": 55,
+          "present": true
+        },
+        {
+          "row_idx": 15,
+          "row_y_orig": 438,
+          "u_coord": 340.5212097167969,
+          "grid_bin": 53,
+          "class_id": 53,
+          "present": true
+        },
+        {
+          "row_idx": 16,
+          "row_y_orig": 454,
+          "u_coord": 330.41888427734375,
+          "grid_bin": 51,
+          "class_id": 51,
+          "present": true
+        },
+        {
+          "row_idx": 17,
+          "row_y_orig": 470,
+          "u_coord": 320.0,
+          "grid_bin": 50,
+          "class_id": 50,
+          "present": true
+        }
+      ],
+      "metadata": {
+        "is_dummy": true,
+        "purpose": "pipeline_verification_only",
+        "simulated_specular_exponent": 45.0,
+        "simulated_lighting_lux": 800.0
+      }
+    },
+    {
+      "image_path": "images/dummy_0003.png",
+      "width": 640,
+      "height": 480,
+      "roi": {
+        "y_min": 200,
+        "y_max": 470,
+        "x_min": 0,
+        "x_max": 640
+      },
+      "row_anchors": [
+        {
+          "row_idx": 0,
+          "row_y_orig": 200,
+          "u_coord": 350.0,
+          "grid_bin": 54,
+          "class_id": 54,
+          "present": true
+        },
+        {
+          "row_idx": 1,
+          "row_y_orig": 216,
+          "u_coord": 362.1553649902344,
+          "grid_bin": 56,
+          "class_id": 56,
+          "present": true
+        },
+        {
+          "row_idx": 2,
+          "row_y_orig": 232,
+          "u_coord": 373.94140625,
+          "grid_bin": 58,
+          "class_id": 58,
+          "present": true
+        },
+        {
+          "row_idx": 3,
+          "row_y_orig": 248,
+          "u_coord": 388.46563720703125,
+          "grid_bin": 60,
+          "class_id": 60,
+          "present": true
+        },
+        {
+          "row_idx": 4,
+          "row_y_orig": 264,
+          "u_coord": 398.03692626953125,
+          "grid_bin": 62,
+          "class_id": 62,
+          "present": true
+        },
+        {
+          "row_idx": 5,
+          "row_y_orig": 279,
+          "u_coord": 406.14862060546875,
+          "grid_bin": 63,
+          "class_id": 63,
+          "present": true
+        },
+        {
+          "row_idx": 6,
+          "row_y_orig": 295,
+          "u_coord": 412.5542907714844,
+          "grid_bin": 64,
+          "class_id": 64,
+          "present": true
+        },
+        {
+          "row_idx": 7,
+          "row_y_orig": 311,
+          "u_coord": 417.05926513671875,
+          "grid_bin": 65,
+          "class_id": 65,
+          "present": true
+        },
+        {
+          "row_idx": 8,
+          "row_y_orig": 327,
+          "u_coord": 419.52667236328125,
+          "grid_bin": 65,
+          "class_id": 65,
+          "present": true
+        },
+        {
+          "row_idx": 9,
+          "row_y_orig": 343,
+          "u_coord": 419.52667236328125,
+          "grid_bin": 65,
+          "class_id": 65,
+          "present": true
+        },
+        {
+          "row_idx": 10,
+          "row_y_orig": 359,
+          "u_coord": 417.05926513671875,
+          "grid_bin": 65,
+          "class_id": 65,
+          "present": true
+        },
+        {
+          "row_idx": 11,
+          "row_y_orig": 375,
+          "u_coord": 412.5542907714844,
+          "grid_bin": 64,
+          "class_id": 64,
+          "present": true
+        },
+        {
+          "row_idx": 12,
+          "row_y_orig": 391,
+          "u_coord": 406.14862060546875,
+          "grid_bin": 63,
+          "class_id": 63,
+          "present": true
+        },
+        {
+          "row_idx": 13,
+          "row_y_orig": 406,
+          "u_coord": 398.03692626953125,
+          "grid_bin": 62,
+          "class_id": 62,
+          "present": true
+        },
+        {
+          "row_idx": 14,
+          "row_y_orig": 422,
+          "u_coord": 388.46563720703125,
+          "grid_bin": 60,
+          "class_id": 60,
+          "present": true
+        },
+        {
+          "row_idx": 15,
+          "row_y_orig": 438,
+          "u_coord": 373.94140625,
+          "grid_bin": 58,
+          "class_id": 58,
+          "present": true
+        },
+        {
+          "row_idx": 16,
+          "row_y_orig": 454,
+          "u_coord": 362.1553649902344,
+          "grid_bin": 56,
+          "class_id": 56,
+          "present": true
+        },
+        {
+          "row_idx": 17,
+          "row_y_orig": 470,
+          "u_coord": 350.0,
+          "grid_bin": 54,
+          "class_id": 54,
+          "present": true
+        }
+      ],
+      "metadata": {
+        "is_dummy": true,
+        "purpose": "pipeline_verification_only",
+        "simulated_specular_exponent": 45.0,
+        "simulated_lighting_lux": 800.0
+      }
+    },
+    {
+      "image_path": "images/dummy_0004.png",
+      "width": 640,
+      "height": 480,
+      "roi": {
+        "y_min": 200,
+        "y_max": 470,
+        "x_min": 0,
+        "x_max": 640
+      },
+      "row_anchors": [
+        {
+          "row_idx": 0,
+          "row_y_orig": 200,
+          "u_coord": 380.0,
+          "grid_bin": 59,
+          "class_id": 59,
+          "present": true
+        },
+        {
+          "row_idx": 1,
+          "row_y_orig": 216,
+          "u_coord": 393.891845703125,
+          "grid_bin": 61,
+          "class_id": 61,
+          "present": true
+        },
+        {
+          "row_idx": 2,
+          "row_y_orig": 232,
+          "u_coord": 407.3616027832031,
+          "grid_bin": 63,
+          "class_id": 63,
+          "present": true
+        },
+        {
+          "row_idx": 3,
+          "row_y_orig": 248,
+          "u_coord": 423.9607238769531,
+          "grid_bin": 66,
+          "class_id": 66,
+          "present": true
+        },
+        {
+          "row_idx": 4,
+          "row_y_orig": 264,
+          "u_coord": 434.8993225097656,
+          "grid_bin": 67,
+          "class_id": 67,
+          "present": true
+        },
+        {
+          "row_idx": 5,
+          "row_y_orig": 279,
+          "u_coord": 444.16986083984375,
+          "grid_bin": 69,
+          "class_id": 69,
+          "present": true
+        },
+        {
+          "row_idx": 6,
+          "row_y_orig": 295,
+          "u_coord": 451.4906005859375,
+          "grid_bin": 70,
+          "class_id": 70,
+          "present": true
+        },
+        {
+          "row_idx": 7,
+          "row_y_orig": 311,
+          "u_coord": 456.63916015625,
+          "grid_bin": 71,
+          "class_id": 71,
+          "present": true
+        },
+        {
+          "row_idx": 8,
+          "row_y_orig": 327,
+          "u_coord": 459.4590759277344,
+          "grid_bin": 71,
+          "class_id": 71,
+          "present": true
+        },
+        {
+          "row_idx": 9,
+          "row_y_orig": 343,
+          "u_coord": 459.4590759277344,
+          "grid_bin": 71,
+          "class_id": 71,
+          "present": true
+        },
+        {
+          "row_idx": 10,
+          "row_y_orig": 359,
+          "u_coord": 456.63916015625,
+          "grid_bin": 71,
+          "class_id": 71,
+          "present": true
+        },
+        {
+          "row_idx": 11,
+          "row_y_orig": 375,
+          "u_coord": 451.4906005859375,
+          "grid_bin": 70,
+          "class_id": 70,
+          "present": true
+        },
+        {
+          "row_idx": 12,
+          "row_y_orig": 391,
+          "u_coord": 444.16986083984375,
+          "grid_bin": 69,
+          "class_id": 69,
+          "present": true
+        },
+        {
+          "row_idx": 13,
+          "row_y_orig": 406,
+          "u_coord": 434.8993225097656,
+          "grid_bin": 67,
+          "class_id": 67,
+          "present": true
+        },
+        {
+          "row_idx": 14,
+          "row_y_orig": 422,
+          "u_coord": 423.9607238769531,
+          "grid_bin": 66,
+          "class_id": 66,
+          "present": true
+        },
+        {
+          "row_idx": 15,
+          "row_y_orig": 438,
+          "u_coord": 407.3616027832031,
+          "grid_bin": 63,
+          "class_id": 63,
+          "present": true
+        },
+        {
+          "row_idx": 16,
+          "row_y_orig": 454,
+          "u_coord": 393.891845703125,
+          "grid_bin": 61,
+          "class_id": 61,
+          "present": true
+        },
+        {
+          "row_idx": 17,
+          "row_y_orig": 470,
+          "u_coord": 380.0,
+          "grid_bin": 59,
+          "class_id": 59,
+          "present": true
+        }
+      ],
+      "metadata": {
+        "is_dummy": true,
+        "purpose": "pipeline_verification_only",
+        "simulated_specular_exponent": 45.0,
+        "simulated_lighting_lux": 800.0
+      }
+    },
+    {
+      "image_path": "images/dummy_0005.png",
+      "width": 640,
+      "height": 480,
+      "roi": {
+        "y_min": 200,
+        "y_max": 470,
+        "x_min": 0,
+        "x_max": 640
+      },
+      "row_anchors": [
+        {
+          "row_idx": 0,
+          "row_y_orig": 200,
+          "u_coord": 410.0,
+          "grid_bin": 64,
+          "class_id": 64,
+          "present": true
+        },
+        {
+          "row_idx": 1,
+          "row_y_orig": 216,
+          "u_coord": 425.6283264160156,
+          "grid_bin": 66,
+          "class_id": 66,
+          "present": true
+        },
+        {
+          "row_idx": 2,
+          "row_y_orig": 232,
+          "u_coord": 440.78179931640625,
+          "grid_bin": 68,
+          "class_id": 68,
+          "present": true
+        },
+        {
+          "row_idx": 3,
+          "row_y_orig": 248,
+          "u_coord": 459.455810546875,
+          "grid_bin": 71,
+          "class_id": 71,
+          "present": true
+        },
+        {
+          "row_idx": 4,
+          "row_y_orig": 264,
+          "u_coord": 471.7617492675781,
+          "grid_bin": 73,
+          "class_id": 73,
+          "present": true
+        },
+        {
+          "row_idx": 5,
+          "row_y_orig": 279,
+          "u_coord": 482.19110107421875,
+          "grid_bin": 75,
+          "class_id": 75,
+          "present": true
+        },
+        {
+          "row_idx": 6,
+          "row_y_orig": 295,
+          "u_coord": 490.42694091796875,
+          "grid_bin": 76,
+          "class_id": 76,
+          "present": true
+        },
+        {
+          "row_idx": 7,
+          "row_y_orig": 311,
+          "u_coord": 496.21905517578125,
+          "grid_bin": 77,
+          "class_id": 77,
+          "present": true
+        },
+        {
+          "row_idx": 8,
+          "row_y_orig": 327,
+          "u_coord": 499.3914489746094,
+          "grid_bin": 78,
+          "class_id": 78,
+          "present": true
+        },
+        {
+          "row_idx": 9,
+          "row_y_orig": 343,
+          "u_coord": 499.3914489746094,
+          "grid_bin": 78,
+          "class_id": 78,
+          "present": true
+        },
+        {
+          "row_idx": 10,
+          "row_y_orig": 359,
+          "u_coord": 496.21905517578125,
+          "grid_bin": 77,
+          "class_id": 77,
+          "present": true
+        },
+        {
+          "row_idx": 11,
+          "row_y_orig": 375,
+          "u_coord": 490.42694091796875,
+          "grid_bin": 76,
+          "class_id": 76,
+          "present": true
+        },
+        {
+          "row_idx": 12,
+          "row_y_orig": 391,
+          "u_coord": 482.19110107421875,
+          "grid_bin": 75,
+          "class_id": 75,
+          "present": true
+        },
+        {
+          "row_idx": 13,
+          "row_y_orig": 406,
+          "u_coord": 471.7617492675781,
+          "grid_bin": 73,
+          "class_id": 73,
+          "present": true
+        },
+        {
+          "row_idx": 14,
+          "row_y_orig": 422,
+          "u_coord": 459.455810546875,
+          "grid_bin": 71,
+          "class_id": 71,
+          "present": true
+        },
+        {
+          "row_idx": 15,
+          "row_y_orig": 438,
+          "u_coord": 440.78179931640625,
+          "grid_bin": 68,
+          "class_id": 68,
+          "present": true
+        },
+        {
+          "row_idx": 16,
+          "row_y_orig": 454,
+          "u_coord": 425.6283264160156,
+          "grid_bin": 66,
+          "class_id": 66,
+          "present": true
+        },
+        {
+          "row_idx": 17,
+          "row_y_orig": 470,
+          "u_coord": 410.0,
+          "grid_bin": 64,
+          "class_id": 64,
+          "present": true
+        }
+      ],
+      "metadata": {
+        "is_dummy": true,
+        "purpose": "pipeline_verification_only",
+        "simulated_specular_exponent": 45.0,
+        "simulated_lighting_lux": 800.0
+      }
+    }
+  ]
+}

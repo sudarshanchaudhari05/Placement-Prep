@@ -1,0 +1,77 @@
+# ==============================================================================
+# Central Research Configuration: Edge-AI Visual Path Tracking for AGVs
+# Project: Latency-Compensated Edge-AI Visual Path Tracking for AGVs Under
+#          Degraded Floor Markings and Specular Glare
+# ==============================================================================
+
+experiment:
+  name: "sict_shufflenet_row_anchor_baseline"
+  seed: 42
+  output_dir: "experiments"
+  device: "cuda" # 'cuda' if available else 'cpu'
+
+camera:
+  input_width: 640
+  input_height: 480
+  channels: 3
+
+roi:
+  # Region of Interest in original camera frame
+  y_min: 200
+  y_max: 470
+  x_min: 0
+  x_max: 640
+
+model:
+  name: "shufflenet_v2_x0_5"
+  pretrained: true
+  input_channels: 3
+  input_height: 288
+  input_width: 384
+  num_row_anchors: 18       # M = 18 horizontal anchor rows
+  num_spatial_bins: 100     # K = 100 gridding cells
+  num_absence_classes: 1    # 1 absence / no-line class
+  # Total classes per row = num_spatial_bins + num_absence_classes = 101
+  # Expected output shape: [batch_size, 18, 101]
+
+sict:
+  enabled: true
+  gamma_lum: 220.0          # Saturation threshold for specular detection
+  delta_spec: 0.05          # Specular chromatic radius threshold
+  alpha: 0.6                # Weight for normalized red chromaticity r
+  beta: 0.4                 # Weight for normalized green chromaticity g
+  epsilon: 1.0e-5           # Numerical stability term
+  ambient_ratio: 0.2        # I_ambient = ambient_ratio * frame_average_intensity
+  frame_avg_mode: "raw_intensity" # Exact frozen specification: spatial mean of raw pixel intensity (S / 765.0)
+  out_channels: 3           # Replicate filtered map to 3 channels for backbone input
+
+training:
+  optimizer: "AdamW"
+  beta1: 0.9
+  beta2: 0.999
+  weight_decay: 1.0e-4
+  initial_lr: 4.0e-3
+  final_lr: 1.0e-5
+  scheduler: "cosine_annealing"
+  batch_size: 32
+  max_epochs: 50
+  num_workers: 0            # Windows-friendly default
+
+loss:
+  focal_gamma: 2.0          # Focal loss focusing parameter
+  lambda_smooth: 0.5        # First-order smoothness weight
+  lambda_curv: 0.75         # Second-order curvature continuity weight
+
+dataset:
+  # Planned synthetic dataset targets (NOT generated yet)
+  synthetic_target_total: 6000
+  synthetic_train_count: 4200 # 70%
+  synthetic_val_count: 900    # 15%
+  synthetic_test_count: 900   # 15%
+  
+  # Planned real-world dataset (Evaluation ONLY, NEVER mixed in training)
+  real_world_target_total: 1000
+
+  # Labeling parameters
+  waypoint_tolerance_px: 7.5 # Waypoint must fall within +/- 7.5 px of anchor row
+  eval_tolerance_px: 8.0     # F1 coordinate evaluation tolerance

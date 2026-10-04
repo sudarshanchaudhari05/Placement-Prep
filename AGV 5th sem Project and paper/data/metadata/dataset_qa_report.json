@@ -1,0 +1,40 @@
+{
+  "total_images": 20,
+  "images_per_split": {
+    "train": 10,
+    "val": 5,
+    "test": 5
+  },
+  "images_per_scenario": {
+    "scenario_a_nominal": 5,
+    "scenario_d_s_curve": 5,
+    "scenario_c_abrasion": 5,
+    "scenario_b_glare": 5
+  },
+  "anchor_statistics": {
+    "total_anchors_evaluated": 360,
+    "absent_anchors_count": 137,
+    "percentage_absent_anchors": 38.06,
+    "avg_visible_anchors_per_image": 11.15,
+    "min_visible_anchors": 1,
+    "max_visible_anchors": 15
+  },
+  "spatial_bin_distribution": {
+    "p10": 11.200000000000003,
+    "p25": 13.0,
+    "median": 52.0,
+    "p75": 53.0,
+    "p90": 55.0
+  },
+  "data_integrity": {
+    "rejected_frames": 0,
+    "invalid_annotations": 0,
+    "duplicate_image_ids": 0,
+    "duplicate_seeds": 0,
+    "scene_leakage": {
+      "train_val_overlap": 0,
+      "train_test_overlap": 0,
+      "val_test_overlap": 0
+    }
+  }
+}
