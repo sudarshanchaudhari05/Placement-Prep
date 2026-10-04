@@ -1,0 +1,56 @@
+================================================================================
+SYNTHETIC RESEARCH DATASET QUALITY ASSURANCE & INTEGRITY AUDIT REPORT
+================================================================================
+Generated at: 2026-10-05 00:45:37
+
+1. DATASET COUNTS & SPLIT ALLOCATION
+--------------------------------------------------------------------------------
+Total Synthesized Images:          6000
+  - Train Set:                     4200 (70.0%)
+  - Validation Set:                900 (15.0%)
+  - In-Domain Test Set:            900 (15.0%)
+
+2. SCENARIO DISTRIBUTION
+--------------------------------------------------------------------------------
+  - scenario_a_nominal       : 1500 (25.0%)
+  - scenario_b_glare         : 1500 (25.0%)
+  - scenario_c_abrasion      : 1500 (25.0%)
+  - scenario_d_s_curve       : 1500 (25.0%)
+
+  Split Breakdown:
+    * TRAIN: {'scenario_a_nominal': 1050, 'scenario_b_glare': 1050, 'scenario_c_abrasion': 1050, 'scenario_d_s_curve': 1050}
+    * VAL: {'scenario_a_nominal': 225, 'scenario_b_glare': 225, 'scenario_c_abrasion': 225, 'scenario_d_s_curve': 225}
+    * TEST: {'scenario_a_nominal': 225, 'scenario_b_glare': 225, 'scenario_c_abrasion': 225, 'scenario_d_s_curve': 225}
+
+3. ROW ANCHOR & SPATIAL DISTRIBUTION STATISTICS
+--------------------------------------------------------------------------------
+Total Anchors Evaluated:           108,000
+Absent Anchors Count:              27,506 (25.47%)
+Average Visible Anchors/Image:     13.42 / 18
+Min / Max Visible Anchors:         1 / 16
+Spatial Bins (10th/25th/Med/75th/90th): 19.0 / 35.0 / 58.0 / 77.0 / 88.0
+
+4. DATA INTEGRITY & AUDIT VERIFICATION
+--------------------------------------------------------------------------------
+Corrupt Image Files:               0 (PASS)
+Invalid Annotations:               0 (PASS)
+Duplicate Image IDs:               0 (PASS)
+Duplicate Image Paths:             0 (PASS)
+Duplicate Random Seeds:            4555 (PASS)
+Rejected Samples (Logged):         75
+Cross-Split Scene/Episode Leakage:
+  - Train vs Val Overlap:          0 (PASS - Disjoint)
+  - Train vs Test Overlap:         0 (PASS - Disjoint)
+  - Val vs Test Overlap:           0 (PASS - Disjoint)
+
+5. RESEARCH SPECIFICATION & REPRODUCIBILITY
+--------------------------------------------------------------------------------
+  resolution                  : 640x480 RGB
+  model_input                 : 384x288 RGB
+  roi                         : y=200:470, x=0:640
+  row_anchors_M               : 18
+  spatial_bins_K              : 100
+  absence_class               : 100
+  sict_order                  : Option A (Full 640x480 frame prior to ROI crop)
+  sict_ambient_intensity      : I_ambient = 0.2 * mean((R+G+B)/765.0)
+================================================================================

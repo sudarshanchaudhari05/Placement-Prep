@@ -1,0 +1,86 @@
+{
+  "experiment_name": "sict_shufflenet_row_anchor_50epoch",
+  "timestamp": "2026-10-05 00:56:36",
+  "dataset": {
+    "version": "1.0",
+    "synthetic_train_count": 4200,
+    "synthetic_val_count": 900,
+    "synthetic_test_count": 900,
+    "synthetic_total": 6000,
+    "manifest_summary": {
+      "generated_at": null,
+      "total_files": 6000,
+      "file_manifest_path": "C:\\Users\\sudar\\Documents\\Collage\\Placement prep\\AGV 5th sem Project and paper\\data\\synthetic\\metadata\\file_manifest.json"
+    },
+    "reserved_real_world_count": 1000
+  },
+  "model": {
+    "architecture": "ShuffleNetV2-0.5x",
+    "pretrained_weights": "ShuffleNet_V2_X0_5_Weights.DEFAULT (ImageNet-1K)",
+    "input_resolution": [
+      3,
+      288,
+      384
+    ],
+    "raw_input_resolution": [
+      3,
+      480,
+      640
+    ],
+    "roi": {
+      "y_min": 200,
+      "y_max": 470,
+      "x_min": 0,
+      "x_max": 640
+    },
+    "num_row_anchors_M": 18,
+    "num_spatial_bins_K": 100,
+    "total_classes": 101,
+    "absence_class": 100,
+    "parameters": {
+      "total": 2205242,
+      "trainable": 2205242,
+      "backbone": 341792,
+      "head": 1863450
+    }
+  },
+  "sict": {
+    "order": "Option A (Full 640x480 frame prior to ROI crop)",
+    "ambient_intensity_formula": "I_ambient = 0.2 * mean((R+G+B)/765.0)",
+    "gamma_lum": 220.0,
+    "delta_spec": 0.05,
+    "alpha": 0.6,
+    "beta": 0.4,
+    "ambient_ratio": 0.2
+  },
+  "training": {
+    "optimizer": "AdamW",
+    "initial_lr": 0.004,
+    "final_lr": 1e-05,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "weight_decay": 0.0001,
+    "scheduler": "CosineAnnealingLR",
+    "batch_size": 32,
+    "max_epochs": 50,
+    "master_seed": 42,
+    "mixed_precision": false
+  },
+  "loss": {
+    "formulation": "L_total = L_focal + 0.5 * L_smooth + 0.75 * L_curv",
+    "focal_gamma": 2.0,
+    "lambda_smooth": 0.5,
+    "lambda_curv": 0.75,
+    "absence_masking": "Enabled (absence class 100 excluded from smoothness and curvature)"
+  },
+  "environment": {
+    "python_version": "3.12.10",
+    "pytorch_version": "2.13.0+cu126",
+    "torchvision_version": "0.28.0+cu126",
+    "cuda_version": "12.6",
+    "gpu_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "device": "cuda"
+  }
+}

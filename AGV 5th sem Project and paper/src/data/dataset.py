@@ -16,7 +16,8 @@ from typing import Dict, Any, List, Optional, Union
 import cv2
 import numpy as np
 import torch
-from torch.utils.data import Dataset
+import random
+from torch.utils.data import Dataset, DataLoader
 
 from configs.config import ProjectConfig
 from src.data.transforms import PreprocessingPipeline
@@ -143,3 +144,57 @@ class RowAnchorDataset(Dataset):
             "metadata": sample.get("metadata", {}),
             "image_path": str(img_p),
         }
+
+
+def collate_row_anchor_batch(batch: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Collate function for RowAnchorDataset batches.
+    Stacks numerical tensors and retains heterogeneous metadata as lists.
+    """
+    images = torch.stack([item["image"] for item in batch], dim=0)
+    targets = torch.stack([item["targets"] for item in batch], dim=0)
+    u_coords = torch.stack([item["u_coords"] for item in batch], dim=0)
+    presence = torch.stack([item["presence"] for item in batch], dim=0)
+    image_paths = [item["image_path"] for item in batch]
+    metadata = [item.get("metadata", {}) for item in batch]
+
+    return {
+        "image": images,
+        "targets": targets,
+        "u_coords": u_coords,
+        "presence": presence,
+        "image_path": image_paths,
+        "metadata": metadata,
+    }
+
+
+def seed_worker(worker_id: int) -> None:
+    """Deterministic worker initialization function for PyTorch DataLoader."""
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+
+
+def build_dataloader(
+    dataset: Dataset,
+    batch_size: int = 32,
+    shuffle: bool = False,
+    num_workers: int = 0,
+    pin_memory: bool = False,
+    drop_last: bool = False,
+    generator: Optional[torch.Generator] = None,
+) -> DataLoader:
+    """
+    Construct a PyTorch DataLoader configured with custom collator and deterministic workers.
+    """
+    return DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        drop_last=drop_last,
+        collate_fn=collate_row_anchor_batch,
+        worker_init_fn=seed_worker,
+        generator=generator,
+    )
+

@@ -1,0 +1,72 @@
+{
+  "summary": {
+    "total_images": 6000,
+    "train_count": 4200,
+    "val_count": 900,
+    "test_count": 900
+  },
+  "scenario_distribution": {
+    "train": {
+      "scenario_a_nominal": 1050,
+      "scenario_b_glare": 1050,
+      "scenario_c_abrasion": 1050,
+      "scenario_d_s_curve": 1050
+    },
+    "val": {
+      "scenario_a_nominal": 225,
+      "scenario_b_glare": 225,
+      "scenario_c_abrasion": 225,
+      "scenario_d_s_curve": 225
+    },
+    "test": {
+      "scenario_a_nominal": 225,
+      "scenario_b_glare": 225,
+      "scenario_c_abrasion": 225,
+      "scenario_d_s_curve": 225
+    },
+    "overall": {
+      "scenario_a_nominal": 1500,
+      "scenario_b_glare": 1500,
+      "scenario_c_abrasion": 1500,
+      "scenario_d_s_curve": 1500
+    }
+  },
+  "anchor_statistics": {
+    "total_anchors_evaluated": 108000,
+    "absent_anchors_count": 27506,
+    "percentage_absent_anchors": 25.47,
+    "avg_visible_anchors_per_image": 13.42,
+    "min_visible_anchors": 1,
+    "max_visible_anchors": 16
+  },
+  "spatial_bin_distribution": {
+    "p10": 19.0,
+    "p25": 35.0,
+    "median": 58.0,
+    "p75": 77.0,
+    "p90": 88.0
+  },
+  "data_integrity": {
+    "corrupt_images": 0,
+    "rejected_frames": 75,
+    "invalid_annotations": 0,
+    "duplicate_image_ids": 0,
+    "duplicate_image_paths": 0,
+    "duplicate_seeds": 4555,
+    "scene_leakage": {
+      "train_val_overlap": 0,
+      "train_test_overlap": 0,
+      "val_test_overlap": 0
+    }
+  },
+  "configuration": {
+    "resolution": "640x480 RGB",
+    "model_input": "384x288 RGB",
+    "roi": "y=200:470, x=0:640",
+    "row_anchors_M": 18,
+    "spatial_bins_K": 100,
+    "absence_class": 100,
+    "sict_order": "Option A (Full 640x480 frame prior to ROI crop)",
+    "sict_ambient_intensity": "I_ambient = 0.2 * mean((R+G+B)/765.0)"
+  }
+}
