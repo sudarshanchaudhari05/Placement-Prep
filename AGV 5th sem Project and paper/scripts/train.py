@@ -23,6 +23,7 @@ import os
 import sys
 import time
 from pathlib import Path
+import psutil
 import numpy as np
 import torch
 import torch.nn as nn
@@ -52,6 +53,11 @@ def parse_args():
     parser.add_argument("--run_name", type=str, default="shufflenet_v2_x0_5_baseline", help="Run identifier")
     parser.add_argument("--use_amp", action="store_true", default=False, help="Enable CUDA AMP (default: False)")
     parser.add_argument("--dry_run", action="store_true", default=False, help="Debug dry run on small subset")
+    parser.add_argument("--num_workers", type=int, default=None, help="DataLoader workers (default: config setting)")
+    parser.add_argument("--pin_memory", action="store_true", default=False, help="Enable DataLoader pin_memory")
+    parser.add_argument("--persistent_workers", action="store_true", default=False, help="Enable DataLoader persistent_workers")
+    parser.add_argument("--prefetch_factor", type=int, default=None, help="DataLoader prefetch_factor")
+    parser.add_argument("--init_checkpoint", type=str, default=None, help="Optional checkpoint path to initialize weights")
     return parser.parse_args()
 
 
@@ -91,18 +97,29 @@ def train_pipeline(args):
     g_train = torch.Generator()
     g_train.manual_seed(args.seed)
 
+    num_workers = args.num_workers if args.num_workers is not None else cfg.training.num_workers
+    pin_memory = args.pin_memory
+    persistent_workers = args.persistent_workers if num_workers > 0 else False
+    prefetch_factor = args.prefetch_factor if num_workers > 0 else None
+
     train_loader = build_dataloader(
         train_ds,
         batch_size=args.batch_size,
         shuffle=True,
-        num_workers=cfg.training.num_workers,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        persistent_workers=persistent_workers,
+        prefetch_factor=prefetch_factor,
         generator=g_train,
     )
     val_loader = build_dataloader(
         val_ds,
         batch_size=args.batch_size,
         shuffle=False,
-        num_workers=cfg.training.num_workers,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        persistent_workers=persistent_workers,
+        prefetch_factor=prefetch_factor,
     )
     print(f"  Train: {len(train_ds)} samples ({len(train_loader)} batches/epoch)")
     print(f"  Val:   {len(val_ds)} samples ({len(val_loader)} batches/epoch)")
@@ -110,6 +127,10 @@ def train_pipeline(args):
     # Model
     print("[Model] Building RowAnchorNet (ShuffleNetV2-0.5x backbone)...")
     model = build_model(cfg, apply_sict_in_forward=False).to(device)
+    if args.init_checkpoint:
+        print(f"  [Init] Loading initial model weights from: {args.init_checkpoint}")
+        init_ckpt = torch.load(args.init_checkpoint, map_location=device)
+        model.load_state_dict(init_ckpt["model_state_dict"], strict=True)
     params = model.count_parameters()
     print(f"  Total Parameters: {params['total']:,} (Trainable: {params['trainable']:,})")
 
@@ -235,6 +256,12 @@ def train_pipeline(args):
             config=None,
         )
 
+        if "rmse_tp_px" not in epoch_metrics:
+            raise KeyError(
+                "Required metric 'rmse_tp_px' missing from evaluation metrics dictionary!"
+            )
+        val_rmse_val = epoch_metrics["rmse_tp_px"]
+
         record = {
             "epoch": epoch,
             "train_loss": avg_train_loss,
@@ -242,19 +269,21 @@ def train_pipeline(args):
             "val_f1": epoch_metrics.get("f1_score", 0.0),
             "val_precision": epoch_metrics.get("precision", 0.0),
             "val_recall": epoch_metrics.get("recall", 0.0),
-            "val_rmse": epoch_metrics.get("rmse_overall", 0.0),
+            "val_rmse_tp_px": val_rmse_val,
+            "val_tp": epoch_metrics.get("tp", 0),
             "lr": current_lr,
             "duration_sec": epoch_duration,
             "is_best": is_best,
         }
         history.append(record)
 
+        rmse_str = f"{val_rmse_val:.2f}px" if not np.isnan(val_rmse_val) else "N/A"
         print(
             f"Epoch [{epoch:02d}/{args.epochs:02d}] "
             f"Train Loss: {avg_train_loss:.4f} | "
             f"Val Loss: {avg_val_loss:.4f} | "
             f"Val F1: {epoch_metrics.get('f1_score', 0.0):.4f} | "
-            f"Val RMSE: {epoch_metrics.get('rmse_overall', 0.0):.2f}px | "
+            f"Val TP-RMSE: {rmse_str} (TP={epoch_metrics.get('tp', 0)}) | "
             f"LR: {current_lr:.2e} | "
             f"Time: {epoch_duration:.1f}s {'[*BEST*]' if is_best else ''}"
         )

@@ -1,0 +1,41 @@
+[
+  {
+    "name": "workers=0 (Baseline)",
+    "num_workers": 0,
+    "pin_memory": false,
+    "persistent_workers": false,
+    "prefetch_factor": null,
+    "warmup_sec": 1.136108636856079,
+    "steady_batch_ms": 586.0324144363403,
+    "samples_per_sec": 54.60448809948226,
+    "estimated_epoch_sec": 76.91675439476967,
+    "ram_increase_mb": 135.12890625,
+    "peak_ram_mb": 712.625
+  },
+  {
+    "name": "workers=2 + pinned + persistent",
+    "num_workers": 2,
+    "pin_memory": true,
+    "persistent_workers": true,
+    "prefetch_factor": 2,
+    "warmup_sec": 4.418836832046509,
+    "steady_batch_ms": 331.7641258239746,
+    "samples_per_sec": 96.45406934979572,
+    "estimated_epoch_sec": 43.54404151439667,
+    "ram_increase_mb": 260.75,
+    "peak_ram_mb": 1013.99609375
+  },
+  {
+    "name": "workers=4 + pinned + persistent",
+    "num_workers": 4,
+    "pin_memory": true,
+    "persistent_workers": true,
+    "prefetch_factor": 2,
+    "warmup_sec": 8.65226411819458,
+    "steady_batch_ms": 185.02249717712402,
+    "samples_per_sec": 172.9519409164933,
+    "estimated_epoch_sec": 24.284202754497528,
+    "ram_increase_mb": 514.671875,
+    "peak_ram_mb": 1569.23046875
+  }
+]

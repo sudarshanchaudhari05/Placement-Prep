@@ -178,14 +178,23 @@ class TotalRowAnchorLoss(nn.Module):
         # 1. Focal loss over all row classifications
         l_focal = self.focal_loss(logits, targets)
 
-        # 2. Derive soft-argmax coordinates for structural regularization
-        # Softmax over all K+1 classes
-        probs = torch.softmax(logits, dim=-1)
-        spatial_probs = probs[:, :, :self.num_spatial_bins]  # (B, M, K)
-        bin_indices = torch.arange(
+        # 2. Derive localized soft-argmax coordinates for structural regularization (radius R=2)
+        spatial_logits = logits[:, :, :self.num_spatial_bins]
+        j_star = torch.argmax(spatial_logits, dim=-1)  # (B, M)
+
+        bin_grid = torch.arange(
             self.num_spatial_bins, dtype=torch.float32, device=logits.device
         ).view(1, 1, self.num_spatial_bins)
-        w_hat = torch.sum(spatial_probs * bin_indices, dim=-1)  # (B, M)
+        dist = torch.abs(bin_grid - j_star.unsqueeze(-1).float())
+        in_window = (dist <= 2.0)
+
+        window_logits = torch.where(
+            in_window,
+            spatial_logits,
+            torch.full_like(spatial_logits, -1e9),
+        )
+        window_probs = F.softmax(window_logits, dim=-1)  # (B, M, K)
+        w_hat = torch.sum(window_probs * bin_grid, dim=-1)  # (B, M)
 
         # Presence mask based on ground truth (exclude absence class 100)
         presence_mask = (targets != self.num_spatial_bins)  # (B, M)

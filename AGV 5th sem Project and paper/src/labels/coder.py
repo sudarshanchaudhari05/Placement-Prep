@@ -116,19 +116,29 @@ def decode_row_anchor_predictions(
     logits: torch.Tensor,
     image_width: int = 640,
     num_spatial_bins: int = 100,
+    local_radius: int = 2,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
-    Decode model logits into predicted presence and soft-argmax horizontal coordinates.
+    Decode model logits into predicted presence and localized soft-argmax horizontal coordinates.
+    
+    Phase 4C Formulation:
+    - Peak spatial bin: j* = argmax_{0..K-1}(z)
+    - Local window: W = [max(0, j* - R), min(K-1, j* + R)] with radius R = 2
+    - Local softmax over window W: p_j = exp(z_j - max(z_W)) / sum_{k in W} exp(z_k - max(z_W))
+    - Continuous coordinate expectation: w_hat = sum_{j in W} j * p_j
+    - Continuous pixel coordinate: u_hat = ((w_hat + 0.5) / K) * image_width
+    - Presence determination: is_present = (argmax_{0..K}(z) != absence_class)
     
     Args:
         logits: Tensor of shape (B, M, K + 1), e.g. (B, 18, 101).
         image_width: 640 px.
         num_spatial_bins: K = 100.
+        local_radius: R = 2 (5-bin window).
         
     Returns:
         pred_coords: Tensor of shape (B, M), continuous u coordinates in [0, 640].
         is_present: Tensor of shape (B, M), boolean mask (True if not absence class).
-        w_hat: Tensor of shape (B, M), soft-argmax bin index in [0, K-1].
+        w_hat: Tensor of shape (B, M), localized soft-argmax bin index in [0, K-1].
     """
     # Strict shape checks
     assert logits.ndim == 3, f"Expected 3D logits (B, M, K+1), got {logits.shape}"
@@ -137,27 +147,36 @@ def decode_row_anchor_predictions(
         f"Expected {num_spatial_bins + 1} classes, got {total_c}"
     )
 
-    # Softmax across all 101 classes: sigma(P_{i, j})
-    probs = torch.softmax(logits, dim=-1)  # (B, M, 101)
-
     absence_class_idx = num_spatial_bins  # 100
-    argmax_classes = torch.argmax(probs, dim=-1)  # (B, M)
+
+    # 1. Presence determination: preserves class-argmax presence rule
+    argmax_classes = torch.argmax(logits, dim=-1)  # (B, M)
     is_present = (argmax_classes != absence_class_idx)  # (B, M)
 
-    # Spatial probabilities for bins 0..K-1
-    spatial_probs = probs[:, :, :num_spatial_bins]  # (B, M, K)
+    # 2. Peak spatial bin selection
+    spatial_logits = logits[:, :, :num_spatial_bins]  # (B, M, K)
+    j_star = torch.argmax(spatial_logits, dim=-1)  # (B, M)
 
-    # Bin indices vector: [0, 1, ..., K-1]
-    bin_indices = torch.arange(
+    # 3. Vectorized local window masking: W = [max(0, j* - R), min(K-1, j* + R)]
+    bin_grid = torch.arange(
         num_spatial_bins, dtype=torch.float32, device=logits.device
     ).view(1, 1, num_spatial_bins)
+    dist = torch.abs(bin_grid - j_star.unsqueeze(-1).float())
+    in_window = (dist <= float(local_radius))
 
-    # Soft-argmax: w_hat_i = sum_{j=0}^{K-1} j * sigma(P_{i,j})
-    # Note: Softmax denominator is sum over all K+1 classes as defined in Section 2.2
-    w_hat = torch.sum(spatial_probs * bin_indices, dim=-1)  # (B, M)
+    # 4. Numerically stable local softmax over window W
+    # Bins outside window are masked with -1e9 so exp(-1e9) -> 0.0
+    window_logits = torch.where(
+        in_window,
+        spatial_logits,
+        torch.full_like(spatial_logits, -1e9),
+    )
+    window_probs = torch.softmax(window_logits, dim=-1)  # (B, M, K)
 
-    # Map soft-argmax bin coordinate back to pixel space u in [0, image_width]
-    # Center of bin j is j + 0.5
+    # 5. Local coordinate expectation
+    w_hat = torch.sum(window_probs * bin_grid, dim=-1)  # (B, M)
+
+    # 6. Reconstruct horizontal pixel coordinate
     pred_coords = ((w_hat + 0.5) / float(num_spatial_bins)) * float(image_width)
 
     return pred_coords, is_present, w_hat
@@ -194,9 +213,14 @@ class RowAnchorCoder:
             waypoint_tolerance_px=self.waypoint_tolerance,
         )
 
-    def decode(self, logits: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def decode(
+        self,
+        logits: torch.Tensor,
+        local_radius: int = 2,
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         return decode_row_anchor_predictions(
             logits=logits,
             image_width=self.image_width,
             num_spatial_bins=self.num_spatial_bins,
+            local_radius=local_radius,
         )

@@ -78,7 +78,7 @@ def compute_row_anchor_metrics(
         else 0.0
     )
 
-    rmse = float(np.sqrt(np.mean(sq_errors))) if len(sq_errors) > 0 else 0.0
+    rmse = float(np.sqrt(np.mean(sq_errors))) if len(sq_errors) > 0 else float("nan")
     total_slots = n_samples * n_rows
     presence_acc = (
         (total_tp + total_tn) / total_slots if total_slots > 0 else 0.0
@@ -94,6 +94,8 @@ def compute_row_anchor_metrics(
         "fp": total_fp,
         "fn": total_fn,
         "tn": total_tn,
+        "num_pred_present": int(total_tp + total_fp),
+        "num_gt_present": int(total_tp + total_fn),
     }
 
 
@@ -131,7 +133,17 @@ class RowAnchorEvaluator:
 
     def compute(self) -> Dict[str, float]:
         if not self.all_pred_coords:
-            return {"f1_score": 0.0, "precision": 0.0, "recall": 0.0, "rmse_tp_px": 0.0}
+            return {
+                "f1_score": 0.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "rmse_tp_px": float("nan"),
+                "presence_accuracy": 0.0,
+                "tp": 0,
+                "fp": 0,
+                "fn": 0,
+                "tn": 0,
+            }
 
         pred_coords = np.concatenate(self.all_pred_coords, axis=0)
         pred_present = np.concatenate(self.all_pred_present, axis=0)

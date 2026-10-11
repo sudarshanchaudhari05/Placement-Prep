@@ -182,19 +182,26 @@ def build_dataloader(
     pin_memory: bool = False,
     drop_last: bool = False,
     generator: Optional[torch.Generator] = None,
+    persistent_workers: bool = False,
+    prefetch_factor: Optional[int] = None,
 ) -> DataLoader:
     """
     Construct a PyTorch DataLoader configured with custom collator and deterministic workers.
     """
-    return DataLoader(
-        dataset,
-        batch_size=batch_size,
-        shuffle=shuffle,
-        num_workers=num_workers,
-        pin_memory=pin_memory,
-        drop_last=drop_last,
-        collate_fn=collate_row_anchor_batch,
-        worker_init_fn=seed_worker,
-        generator=generator,
-    )
+    kwargs = {
+        "batch_size": batch_size,
+        "shuffle": shuffle,
+        "num_workers": num_workers,
+        "pin_memory": pin_memory,
+        "drop_last": drop_last,
+        "collate_fn": collate_row_anchor_batch,
+        "worker_init_fn": seed_worker if num_workers > 0 else None,
+        "generator": generator,
+    }
+    if num_workers > 0:
+        kwargs["persistent_workers"] = persistent_workers
+        if prefetch_factor is not None:
+            kwargs["prefetch_factor"] = prefetch_factor
+
+    return DataLoader(dataset, **kwargs)
 
