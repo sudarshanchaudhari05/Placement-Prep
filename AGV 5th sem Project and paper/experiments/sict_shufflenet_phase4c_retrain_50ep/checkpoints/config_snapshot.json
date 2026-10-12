@@ -47,7 +47,7 @@
     "scheduler": "cosine_annealing",
     "batch_size": 32,
     "max_epochs": 50,
-    "num_workers": 0
+    "num_workers": 2
   },
   "loss": {
     "focal_gamma": 2.0,

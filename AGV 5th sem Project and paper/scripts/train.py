@@ -38,7 +38,7 @@ from src.losses.structural_loss import TotalRowAnchorLoss
 from src.engine.trainer import build_optimizer, build_scheduler, train_one_step
 from src.engine.validator import validate_one_step
 from src.evaluation.metrics import RowAnchorEvaluator
-from src.utils.checkpoint import save_checkpoint
+from src.utils.checkpoint import save_checkpoint, load_checkpoint
 from src.utils.seed import seed_everything
 
 
@@ -58,6 +58,7 @@ def parse_args():
     parser.add_argument("--persistent_workers", action="store_true", default=False, help="Enable DataLoader persistent_workers")
     parser.add_argument("--prefetch_factor", type=int, default=None, help="DataLoader prefetch_factor")
     parser.add_argument("--init_checkpoint", type=str, default=None, help="Optional checkpoint path to initialize weights")
+    parser.add_argument("--resume_from", type=str, default=None, help="Path to checkpoint to resume full training state from")
     return parser.parse_args()
 
 
@@ -72,6 +73,9 @@ def train_pipeline(args):
     cfg.training.initial_lr = args.lr
     cfg.training.final_lr = args.final_lr
     cfg.experiment.seed = args.seed
+    cfg.experiment.run_name = args.run_name
+    num_workers = args.num_workers if args.num_workers is not None else cfg.training.num_workers
+    cfg.training.num_workers = num_workers
     cfg.validate()
 
     # Hardware setup
@@ -97,7 +101,6 @@ def train_pipeline(args):
     g_train = torch.Generator()
     g_train.manual_seed(args.seed)
 
-    num_workers = args.num_workers if args.num_workers is not None else cfg.training.num_workers
     pin_memory = args.pin_memory
     persistent_workers = args.persistent_workers if num_workers > 0 else False
     prefetch_factor = args.prefetch_factor if num_workers > 0 else None
@@ -127,7 +130,7 @@ def train_pipeline(args):
     # Model
     print("[Model] Building RowAnchorNet (ShuffleNetV2-0.5x backbone)...")
     model = build_model(cfg, apply_sict_in_forward=False).to(device)
-    if args.init_checkpoint:
+    if args.init_checkpoint and not args.resume_from:
         print(f"  [Init] Loading initial model weights from: {args.init_checkpoint}")
         init_ckpt = torch.load(args.init_checkpoint, map_location=device)
         model.load_state_dict(init_ckpt["model_state_dict"], strict=True)
@@ -144,15 +147,76 @@ def train_pipeline(args):
     scaler = torch.amp.GradScaler("cuda", enabled=args.use_amp) if device.type == "cuda" else None
 
     # Training state
+    start_epoch = 1
     best_val_loss = float("inf")
     history = []
 
+    if args.resume_from:
+        resume_path = Path(args.resume_from)
+        if not resume_path.is_absolute():
+            resume_path = PROJECT_ROOT / resume_path
+        if not resume_path.exists():
+            raise FileNotFoundError(f"Resume checkpoint not found: {resume_path}")
+
+        print(f"[Resume] Restoring full training state from: {resume_path}")
+        resume_data = load_checkpoint(
+            resume_path,
+            model=model,
+            optimizer=optimizer,
+            scheduler=scheduler,
+            device=device,
+        )
+
+        resumed_epoch = resume_data["epoch"]
+        start_epoch = resumed_epoch + 1
+        print(f"[Resume] Restored Epoch {resumed_epoch}. Resuming at Epoch {start_epoch} -> {args.epochs}")
+
+        # Reconstruct history for epochs 1..resumed_epoch from existing checkpoints
+        for e in range(1, start_epoch):
+            e_ckpt_path = ckpt_dir / f"checkpoint_epoch_{e:03d}.pth"
+            if not e_ckpt_path.exists():
+                raise FileNotFoundError(
+                    f"Cannot reconstruct historical epoch {e}: checkpoint file missing: {e_ckpt_path}"
+                )
+            e_data = torch.load(e_ckpt_path, map_location="cpu")
+            val_metrics = e_data.get("val_metrics", {})
+            required_val_keys = ["f1_score", "precision", "recall", "rmse_tp_px", "tp"]
+            for k in required_val_keys:
+                if k not in val_metrics:
+                    raise KeyError(
+                        f"Checkpoint for epoch {e} is missing required metric '{k}' in val_metrics!"
+                    )
+
+            duration = e_data.get("duration_sec", None)
+
+            record = {
+                "epoch": e_data["epoch"],
+                "train_loss": e_data["train_loss"],
+                "val_loss": e_data["val_loss"],
+                "val_f1": val_metrics["f1_score"],
+                "val_precision": val_metrics["precision"],
+                "val_recall": val_metrics["recall"],
+                "val_rmse_tp_px": val_metrics["rmse_tp_px"],
+                "val_tp": val_metrics["tp"],
+                "lr": e_data["learning_rate"],
+                "duration_sec": duration,
+                "is_best": False,
+            }
+            history.append(record)
+
+        if history:
+            best_val_loss = min(r["val_loss"] for r in history)
+            for r in history:
+                if abs(r["val_loss"] - best_val_loss) < 1e-6:
+                    r["is_best"] = True
+            print(f"[Resume] Reconstructed {len(history)} epochs of history. Historical best val loss: {best_val_loss:.4f}")
+
     print("\n" + "=" * 75)
-    print(f"STARTING TRAINING: {args.epochs} EPOCHS, BATCH SIZE {args.batch_size}, LR {args.lr}")
+    print(f"STARTING TRAINING: {args.epochs} EPOCHS (Starting at {start_epoch}), BATCH SIZE {args.batch_size}, LR {args.lr}")
     print("=" * 75)
 
     start_time = time.time()
-    for epoch in range(1, args.epochs + 1):
+    for epoch in range(start_epoch, args.epochs + 1):
         epoch_start = time.time()
         model.train()
         train_losses = []
