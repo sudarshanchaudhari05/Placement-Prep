@@ -1,0 +1,12 @@
+Time resolution is 1 ps
+Input  Detected
+  1       0
+  0       0
+  1       0
+  1       1
+  0       0
+  1       0
+  1       1
+Total detections = 2
+TEST PASSED
+$finish called at time : 106 ns : File "C:/Users/sudar/Documents/Collage/Placement prep/vivado/FSM_Sequence_Detector/FSM_Sequence_Detector.srcs/sim_1/new/tb_sequence_detector.v" Line 85
