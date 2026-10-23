@@ -1,0 +1,597 @@
+
+function out = ev_run_simulation(cfg, scenarioName)
+%EV_RUN_SIMULATION Switching boost-converter EV battery charger simulation.
+% Compatible with ev_config.m.
+%
+% Model features:
+%   - Fixed-step switching boost converter
+%   - 13S Li-ion battery model
+%   - Constant-current / constant-voltage (CC/CV) charging
+%   - Separate CC and CV PI controllers
+%   - Duty-cycle saturation and slew-rate limiting
+%   - Input, output, current, power, and temperature protection
+%   - Battery SOC and approximate thermal tracking
+%   - Scenario-specific input voltage and power conditions
+%
+% This is an illustrative simulation, not a validated hardware controller.
+
+if nargin < 2 || isempty(scenarioName)
+    scenarioName = "Nominal 24 V";
+end
+scenarioName = string(scenarioName);
+
+%% 1. Apply scenario settings
+
+scenarioLower = lower(scenarioName);
+
+if contains(scenarioLower, "low input")
+    cfg.source.Vin = 12;
+
+elseif contains(scenarioLower, "high input")
+    cfg.source.Vin = 48;
+
+elseif contains(scenarioLower, "nominal")
+    cfg.source.Vin = 24;
+
+elseif contains(scenarioLower, "power limit")
+    cfg.source.Vin = 24;
+    cfg.converter.powerW = 250;
+
+elseif contains(scenarioLower, "high soc")
+    cfg.source.Vin = 24;
+    cfg.battery.initialSOC = 0.95;
+
+elseif contains(scenarioLower, "input sag")
+    cfg.source.Vin = 24;
+
+elseif contains(scenarioLower, "overvoltage")
+    cfg.source.Vin = 65;
+
+elseif contains(scenarioLower, "input step")
+    cfg.source.Vin = 24;
+end
+
+%% 2. Simulation parameters
+
+dt = cfg.sim.dt;
+duration = cfg.sim.duration;
+N = round(duration / dt) + 1;
+
+fs = cfg.converter.fs;
+Tsw = 1 / fs;
+stepsPerCycle = max(1, round(Tsw / dt));
+
+L = cfg.converter.L;
+C = cfg.converter.C;
+rL = cfg.converter.rL;
+
+VinNominal = cfg.source.Vin;
+
+%% 3. Allocate simulation arrays
+
+t = (0:N-1)' * dt;
+
+switchLog = false(N,1);
+slewLimitedLog = false(N,1);
+
+VinLog = zeros(N,1);
+IL = zeros(N,1);
+Vout = zeros(N,1);
+Ibat = zeros(N,1);
+SOC = zeros(N,1);
+dutyLog = zeros(N,1);
+temp = zeros(N,1);
+mode = strings(N,1);
+trip = false(N,1);
+
+Pin = zeros(N,1);
+Pout = zeros(N,1);
+etaLog = zeros(N,1);
+IcommandLog = zeros(N,1);
+VrefLog = zeros(N,1);
+
+integratorILog = zeros(N,1);
+errILog = zeros(N,1);
+errVLog = zeros(N,1);
+integratorVLog = zeros(N,1);
+dutyUnsatLog = zeros(N,1);
+dutySatLog = zeros(N,1);
+
+%% 4. Initial conditions
+
+SOC(1) = min(max(cfg.battery.initialSOC, ...
+    cfg.battery.minSOC), cfg.battery.maxSOC);
+
+temp(1) = cfg.protection.startTemperatureC;
+
+Voc0 = battery_ocv(SOC(1), cfg);
+
+Vout(1) = min(cfg.battery.Vcv, Voc0 + 0.05);
+IL(1) = 0;
+
+duty = min(max(1 - VinNominal / ...
+    max(Vout(1), VinNominal + 0.5), ...
+    cfg.converter.dutyMin), cfg.converter.dutyMax);
+
+integratorV = 0;
+integratorI = 0;
+
+tripped = false;
+tripReason = "None";
+% Fractional PWM accumulator improves average duty resolution.
+pwmRemainder = 0;
+pwmOnSamples = 0;
+
+%% 5. Main switching simulation loop
+
+for n = 1:N
+
+
+    % Determine the input-voltage profile for this scenario.
+    Vin = VinNominal;
+
+    if contains(scenarioLower, "input sag") && t(n) >= 0.25
+        Vin = 6;
+    elseif contains(scenarioLower, "input step") && t(n) >= 0.40
+        Vin = 18;
+    end
+
+    VinLog(n) = Vin;
+
+    % Check input faults BEFORE calculating battery current or updating states.
+    if cfg.protection.enable && ~tripped
+        if Vin < cfg.protection.inputUV
+            tripped = true;
+            tripReason = "Input undervoltage";
+        elseif Vin > cfg.protection.inputOV
+            tripped = true;
+            tripReason = "Input overvoltage";
+        end
+    end
+
+    % Hold the previous electrical state after a trip.
+
+    % Post-trip behavior: disable PWM but allow stored energy to decay.
+
+    % Post-trip handling
+    if tripped
+
+        duty = 0;
+        dutyLog(n) = 0;
+        switchLog(n) = false;
+        trip(n) = true;
+
+        % No new charging request after a protection trip.
+        IcommandLog(n) = 0;
+        VrefLog(n) = Vout(n);
+        mode(n) = "TRIPPED";
+
+        if contains(scenarioLower, "overvoltage")
+            % Idealized input-overvoltage shutdown.
+            % Do not report charging current or power after trip.
+            Ibat(n) = 0;
+            Pin(n) = 0;
+            Pout(n) = 0;
+            etaLog(n) = 0;
+
+            % Hold output voltage; disable inductor current.
+            if n < N
+                IL(n+1) = 0;
+                Vout(n+1) = Vout(n);
+                SOC(n+1) = SOC(n);
+                temp(n+1) = temp(n);
+            end
+
+
+        else
+            % Input-sag fault: zero reported charging current and power.
+            Ibat(n) = 0;
+            Pin(n) = 0;
+            Pout(n) = 0;
+            etaLog(n) = 0;
+
+            if n < N
+                IL(n+1) = 0;
+                Vout(n+1) = Vout(n);
+                SOC(n+1) = SOC(n);
+                temp(n+1) = temp(n);
+            end
+        end
+
+ 
+
+        continue;
+    end
+
+
+    % Calculate battery open-circuit voltage and charging current.
+    Voc = battery_ocv(SOC(n), cfg);
+
+    Rbat = max(cfg.battery.internalResistance, 1e-4);
+
+    Ibat(n) = max(0, (Vout(n) - Voc) / Rbat);
+    % Battery overcurrent protection
+    if cfg.protection.enable && ...
+            Ibat(n) > cfg.protection.maxBatteryCurrentA
+        tripped = true;
+        tripReason = "Battery overcurrent";
+    end
+
+    % Charging current limited by CC reference, power, and input capability.
+    % Converter rating is specified as OUTPUT power.
+maxByPower = cfg.converter.powerW / max(Vout(n), 1);
+
+    maxByInput = max(0, Vin) * ...
+        cfg.source.maxInputCurrentA * ...
+        cfg.converter.efficiency / cfg.battery.Vcv;
+
+    Icommand = max(0, min([cfg.control.Icc, ...
+        maxByPower, maxByInput]));
+
+
+    % Separate CC current request from the CV voltage ceiling.
+    % CC regulates battery current; CV regulates output voltage at Vcv.
+    % Determine CC or CV mode from the predicted battery voltage.
+
+    % Predict terminal voltage at the requested CC current
+    VccRef = Voc + Icommand * Rbat;
+
+    % Select CC or CV mode
+    if ~cfg.control.enableCCCV
+        currentMode = "CV";
+    elseif VccRef >= cfg.battery.Vcv - ...
+            cfg.control.cvTransitionMarginV
+        currentMode = "CV";
+    else
+        currentMode = "CC";
+    end
+
+    % Keep the voltage ceiling fixed at the CV target
+    Vref = cfg.battery.Vcv;
+
+    IcommandLog(n) = Icommand;
+    VrefLog(n) = Vref;
+
+
+    mode(n) = currentMode;
+
+    % Evaluate input and output power.
+    Pin(n) = max(0, Vin * IL(n));
+    Pout(n) = max(0, Vout(n) * Ibat(n));
+
+    if Pin(n) > 1e-9
+        etaLog(n) = min(1, Pout(n) / Pin(n));
+    else
+        etaLog(n) = 0;
+    end
+
+    % Continue recording values after a protection trip.
+    if tripped
+        trip(n) = true;
+        duty = 0;
+        dutyLog(n) = 0;
+
+    else
+        %% 5A. Protection checks
+
+        if cfg.protection.enable
+
+            if cfg.protection.enable && Ibat(n) > cfg.protection.maxBatteryCurrentA
+                tripped = true;
+                tripReason = "Battery overcurrent";
+            end
+            if Vin < cfg.protection.inputUV
+                tripped = true;
+                tripReason = "Input undervoltage";
+
+            elseif Vin > cfg.protection.inputOV
+                tripped = true;
+                tripReason = "Input overvoltage";
+
+            elseif Vout(n) > cfg.protection.outputOV
+                tripped = true;
+                tripReason = "Output overvoltage";
+
+            elseif IL(n) > cfg.protection.maxInputCurrentA
+                tripped = true;
+                tripReason = "Input overcurrent";
+
+            elseif n > stepsPerCycle && ...
+                    mean(Pin(max(1,n-stepsPerCycle+1):n)) > ...
+                    (cfg.converter.powerW / ...
+                    cfg.converter.efficiency) * 1.15
+                tripped = true;
+                tripReason = "Input power limit exceeded";
+
+            elseif temp(n) >= cfg.protection.maxTemperatureC
+                tripped = true;
+                tripReason = "Overtemperature";
+            end
+        end
+
+        if tripped
+            duty = 0;
+            dutyLog(n) = 0;
+            trip(n) = true;
+
+        else
+            %% 5B. CC/CV controller update
+            % Update once per switching period.
+
+            if mod(n-1, stepsPerCycle) == 0
+
+                Ts = stepsPerCycle * dt;
+
+                % Boost-converter feedforward based on the CV target.
+                VdutyRef = cfg.battery.Vcv;
+
+                dutyFF = 1 - Vin / max(VdutyRef, Vin + 0.5);
+
+                dutyFF = min(max(dutyFF, cfg.converter.dutyMin), ...
+                    cfg.converter.dutyMax); 
+
+                if currentMode == "CC"
+
+                    % CONSTANT-CURRENT controller
+
+                    % CONSTANT-CURRENT controller with power/current limiting
+
+                    % Output power and battery-current constraints
+                    Pavailable = min(cfg.converter.powerW, ...
+                        max(0, Vin * cfg.protection.maxInputCurrentA * ...
+                        cfg.converter.efficiency));
+
+                    IpowerLimit = Pavailable / max(Vout(n), 1);
+                    ImaxAllowed = min(cfg.protection.maxBatteryCurrentA, IpowerLimit);
+                    IcommandCC = min(cfg.control.Icc, ImaxAllowed);
+
+
+                    errI = IcommandCC - Ibat(n);
+
+                    candidateI = integratorI + ...
+                        cfg.control.KiCurrent * errI * Ts;
+
+                    dutyUnsat = dutyFF + ...
+                        cfg.control.KpCurrent * errI + candidateI;
+
+                    errILog(n) = errI;
+                    dutyUnsatLog(n) = dutyUnsat;
+
+                    dutySat = min(max(dutyUnsat, ...
+                        cfg.converter.dutyMin), ...
+                        cfg.converter.dutyMax);
+
+                    % Limit duty movement per switching cycle.
+                    dutyNew = min(max(dutySat, ...
+                        duty - cfg.control.maxDutyStep), ...
+                        duty + cfg.control.maxDutyStep);
+
+                    slewLimitedLog(n) = abs(dutySat - dutyNew) > 1e-12;
+
+                    dutyNew = min(max(dutyNew, ...
+                        cfg.converter.dutyMin), ...
+                        cfg.converter.dutyMax);
+
+                    % Anti-windup for duty saturation and slew limiting.
+                    atUpperLimit = dutySat >= cfg.converter.dutyMax && errI > 0;
+                    atLowerLimit = dutySat <= cfg.converter.dutyMin && errI < 0;
+
+                    slewBlocksIntegration = ...
+                        (dutySat > dutyNew + 1e-12 && errI > 0) || ...
+                        (dutySat < dutyNew - 1e-12 && errI < 0);
+
+                    if ~(atUpperLimit || atLowerLimit || slewBlocksIntegration)
+                        integratorI = candidateI;
+                    end
+
+                else
+
+
+                    % CONSTANT-VOLTAGE controller
+                    errV = Vref - Vout(n);
+
+                    candidateV = integratorV + ...
+                        cfg.control.KiVoltage * errV * Ts;
+
+                    dutyUnsat = dutyFF + ...
+                        cfg.control.KpVoltage * errV + candidateV;
+
+                    % Saturate the requested duty cycle
+                    dutySat = min(max(dutyUnsat, ...
+                        cfg.converter.dutyMin), ...
+                        cfg.converter.dutyMax);
+
+                    % Limit duty movement per switching cycle
+                    dutyNew = min(max(dutySat, ...
+                        duty - cfg.control.maxDutyStep), ...
+                        duty + cfg.control.maxDutyStep);
+
+                    slewLimitedLog(n) = abs(dutySat - dutyNew) > 1e-12;
+
+                    dutyNew = min(max(dutyNew, ...
+                        cfg.converter.dutyMin), ...
+                        cfg.converter.dutyMax);
+
+                    % CV anti-windup
+                    atUpperLimitV = dutySat >= cfg.converter.dutyMax && errV > 0;
+                    atLowerLimitV = dutySat <= cfg.converter.dutyMin && errV < 0;
+
+                    if ~(atUpperLimitV || atLowerLimitV)
+                        integratorV = candidateV;
+                    end
+
+                    % Log values AFTER calculating them
+                    errVLog(n) = errV;
+                    integratorVLog(n) = integratorV;
+                    dutyUnsatLog(n) = dutyUnsat;
+                    dutySatLog(n) = dutySat;
+
+                end
+
+                % Apply a conservative duty guard when current or power is excessive.
+                PoutNow = Vout(n) * max(0, Ibat(n));
+
+                if Ibat(n) > cfg.protection.maxBatteryCurrentA || ...
+                        PoutNow > cfg.converter.powerW
+                    dutyNew = min(dutyNew, duty);
+                end
+
+                duty = dutyNew;
+            end
+
+            dutyLog(n) = duty;
+            integratorILog(n) = integratorI;
+        end
+    end
+
+    %% 5C. Switching-converter dynamics
+
+        % If protection has tripped, disable the switch.
+
+        switchOn = false;
+  
+
+        if ~tripped
+            phase = mod(n-1, stepsPerCycle);
+
+            % Distribute fractional pulse widths across switching cycles.
+            if phase == 0
+                exactOnSamples = duty * stepsPerCycle + pwmRemainder;
+                pwmOnSamples = floor(exactOnSamples);
+                pwmRemainder = exactOnSamples - pwmOnSamples;
+            end
+
+            switchOn = phase < pwmOnSamples;
+            % Diagnostic logging: actual PWM switch state
+            
+        end
+switchLog(n) = switchOn;
+
+    if switchOn
+        % Switch ON: inductor stores energy.
+        dIL = (Vin - rL * IL(n)) / L;
+        iCap = -Ibat(n);
+
+    else
+        % Switch OFF: inductor transfers energy to output.
+        dIL = (Vin - Vout(n) - rL * IL(n)) / L;
+        iCap = IL(n) - Ibat(n);
+    end
+
+    % Forward-Euler state integration.
+    if n < N
+
+        IL(n+1) = max(0, IL(n) + dIL * dt);
+
+        Vout(n+1) = Vout(n) + (iCap / C) * dt;
+
+        % Numerical bounds for simulation stability.
+        Vout(n+1) = min(max(Vout(n+1), 0), ...
+            cfg.protection.outputOV + 10);
+
+        % Coulomb-counting SOC estimate.
+        SOC(n+1) = SOC(n) + ...
+            Ibat(n) * dt / (cfg.battery.capacityAh * 3600);
+
+        SOC(n+1) = min(max(SOC(n+1), ...
+            cfg.battery.minSOC), cfg.battery.maxSOC);
+
+        % First-order thermal approximation using estimated converter loss.
+        lossW = max(0, Pin(n) - Pout(n));
+
+        targetTemp = cfg.protection.startTemperatureC + ...
+            cfg.protection.thermalResistanceCperW * lossW;
+
+        dTemp = (targetTemp - temp(n)) / ...
+            max(cfg.protection.thermalTimeConstantS, 1e-6);
+
+        temp(n+1) = temp(n) + dTemp * dt;
+    end
+
+    trip(n) = tripped;
+end
+
+%% 6. Smooth plotted signals over approximately one switching cycle
+
+window = max(1, stepsPerCycle);
+
+VoutSmooth = movmean(Vout, window);
+IbatSmooth = movmean(Ibat, window);
+PinSmooth = movmean(Pin, window);
+PoutSmooth = movmean(Pout, window);
+etaSmooth = movmean(etaLog, window);
+
+%% 7. Downsample output for plotting
+
+maxPoints = max(2, cfg.plot.maxPoints);
+stride = max(1, ceil(N / maxPoints));
+
+idx = unique([1:stride:N, N]);
+
+
+%% Diagnostic: preserve raw final switching cycles
+
+samplesToCapture = min(N, 10 * stepsPerCycle);
+rawIdx = (N - samplesToCapture + 1):N;
+
+out.raw.t = t(rawIdx);
+out.raw.IL = IL(rawIdx);
+out.raw.Vout = Vout(rawIdx);
+out.raw.Ibat = Ibat(rawIdx);
+out.raw.duty = dutyLog(rawIdx);
+out.raw.Vin = VinLog(rawIdx);
+out.raw.trip = trip(rawIdx);
+out.raw.switchOn = switchLog(rawIdx);
+out.raw.slewLimited = slewLimitedLog(rawIdx);
+%% 8. Package results
+
+out.name = scenarioName;
+out.t = t(idx);
+out.Vin = VinLog(idx);
+out.IL = IL(idx);
+out.Vout = VoutSmooth(idx);
+out.Ibat = IbatSmooth(idx);
+out.SOC = SOC(idx);
+out.duty = dutyLog(idx);
+out.temp = temp(idx);
+out.mode = mode(idx);
+out.raw.mode = mode;
+out.trip = trip(idx);
+out.Pin = PinSmooth(idx);
+out.Pout = PoutSmooth(idx);
+out.efficiency = etaSmooth(idx);
+out.integratorI = integratorILog(idx);
+out.errI = errILog(idx);
+out.dutyUnsat = dutyUnsatLog(idx);
+out.Icommand = IcommandLog(idx);
+out.Vref = VrefLog(idx);
+out.errV = errVLog(idx);
+out.integratorV = integratorVLog(idx);
+out.dutyUnsat = dutyUnsatLog(idx);
+out.dutySat = dutySatLog(idx);
+
+if any(trip)
+    out.status = "TRIPPED";
+else
+    out.status = "Completed";
+end
+
+out.tripReason = tripReason;
+out.cfg = cfg;
+
+end
+
+%% Local helper function
+
+function Voc = battery_ocv(soc, cfg)
+%BATTERY_OCV Approximate 13S battery open-circuit voltage.
+% Linear SOC-to-voltage approximation; not an electrochemical model.
+
+Vmin = cfg.battery.seriesCells * 3.2;
+Vmax = cfg.battery.seriesCells * cfg.battery.cellMaxV;
+
+soc = min(max(soc, 0), 1);
+
+Voc = Vmin + soc * (Vmax - Vmin);
+
+end

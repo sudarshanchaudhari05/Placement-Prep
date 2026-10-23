@@ -1,0 +1,59 @@
+function cfg = ev_config()
+%EV_CONFIG Central configuration for the EV charger simulation.
+% All values are illustrative engineering starting points, not hardware calibration.
+
+cfg.sim.dt = 2e-6;          % fixed integration step [s]
+cfg.sim.duration = 0.5;      % simulated time per scenario [s]
+cfg.sim.maxSamples = round(cfg.sim.duration/cfg.sim.dt) + 1;
+
+cfg.source.Vin = 24;         % nominal input source [V]
+cfg.source.minOperatingV = 8;
+cfg.source.maxOperatingV = 60;
+cfg.source.maxInputCurrentA = 30;
+
+cfg.converter.powerW = 1200; % configurable: proposal says 1200 W; prior discussion mentioned 1800 W
+cfg.converter.efficiency = 0.90;
+cfg.converter.fs = 10000;     % switching frequency [Hz]; 50 integration steps per cycle
+cfg.converter.L = 470e-6;    % boost inductor [H]
+cfg.converter.C = 2200e-6;   % output capacitor [F]
+cfg.converter.rL = 0.08;     % inductor series resistance [ohm]
+cfg.converter.dutyMin = 0.01;
+cfg.converter.dutyMax = 0.80;
+
+cfg.battery.seriesCells = 13;
+cfg.battery.cellMaxV = 4.2;
+cfg.battery.Vcv = cfg.battery.seriesCells * cfg.battery.cellMaxV; % 54.6 V
+cfg.battery.capacityAh = 20; % configurable pack capacity
+cfg.battery.initialSOC = 0.50;
+cfg.battery.internalResistance = 0.15; % lumped pack resistance [ohm]
+cfg.battery.minSOC = 0.02;
+cfg.battery.maxSOC = 1.00;
+
+% Separate CC and CV controller gains (initial tuning values)
+cfg.control.Icc = 22.0;
+cfg.control.Vcv = cfg.battery.Vcv;
+cfg.control.cvTransitionMarginV = 0.02;
+cfg.control.KpCurrent = 0.005;
+cfg.control.KiCurrent = 0.45;
+cfg.control.KpVoltage = 0.0045;
+cfg.control.KiVoltage = 0.300;
+cfg.control.maxDutyStep = 0.0005;
+cfg.control.controllerUpdateHz = cfg.converter.fs;
+cfg.control.enableCCCV = true;
+
+
+cfg.protection.inputUV = 8;
+cfg.protection.inputOV = 60;
+cfg.protection.outputOV = cfg.battery.Vcv + 0.05;
+cfg.protection.maxBatteryCurrentA = cfg.control.Icc * 1.10;
+cfg.protection.maxInputCurrentA = 30;
+cfg.protection.maxTemperatureC = 95;
+cfg.protection.startTemperatureC = 28;
+cfg.protection.thermalResistanceCperW = 0.035; % simple illustrative thermal proxy
+cfg.protection.thermalTimeConstantS = 15;
+cfg.protection.enable = true;
+
+% Set true to retain switching ripple in the plots. The output is downsampled
+% for plotting only; simulation still uses every integration step.
+cfg.plot.maxPoints = 12000;
+end
