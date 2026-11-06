@@ -1,0 +1,3 @@
+
+--- STDERR / ERROR ---
+cat: /proc/pressure/memory: Permission denied

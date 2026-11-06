@@ -1,0 +1,3 @@
+
+--- STDERR / ERROR ---
+adb.exe: device 'a9efe51e' not found

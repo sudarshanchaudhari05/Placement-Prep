@@ -1,0 +1,64 @@
+ACTIVITY MANAGER LRU PROCESSES (dumpsys activity lru)
+  Activities:
+  #60: fg     SVC  ---- 17093:com.android.settings/1000 act:activities|recents
+  #59: vis    BFGS ---N 25127:com.miui.home/u0a79 act:activities
+  #58: vis    BFGS LCMN 16945:com.google.android.googlequicksearchbox:interactor/u0a167 act:treated
+  #57: cch    CACC ---- 11983:com.google.android.googlequicksearchbox:googleapp/u0a167 act:client
+  #56: vis    BFGS LCMN 3407:com.google.android.inputmethod.latin/u0a198 act:treated
+  Other:
+  #55: vis    BFGS LCMN 1869:com.google.android.gms/u0a166
+  #54: vis    BFGS LCMN 13910:com.google.android.gms.unstable/u0a166
+  #53: cch+ 5 CEM  ---- 11426:com.google.process.gservices/u0a166
+  #52: cch+ 5 CEM  ---- 14897:com.google.android.apps.turbo/u0a161
+  #51: cch+15 CEM  ---- 5765:com.whatsapp/u0a250
+  #50: cch+15 CEM  ---- 14819:com.milink.service/u0a105
+  #49: cch+25 CEM  ---- 14844:com.milink.runtime/u0a105
+  #48: fg     FGS  ---N 4367:com.miui.securitycenter.remote/1000
+  #47: fg     BFGS ---N 5791:com.miui.powerkeeper/1000
+  #46: cch+ 5 CEM  ---- 13974:com.google.android.apps.messaging/u0a174
+  #45: cch+35 CEM  ---- 12940:android.process.acore/u0a57
+  #44: cch+45 CEM  ---- 14571:com.indus.appstore/u0a260
+  #43: cch+45 CEM  ---- 12836:com.xiaomi.mipicks/u0a104
+  #42: cch+55 CEM  ---- 14520:com.google.android.cellbroadcastreceiver/u0a226
+  #41: cch+55 CEM  ---- 14474:com.xiaomi.account/u0a96
+  #40: vis    IMPF ---- 4943:com.xiaomi.xmsf/u0a138
+  #39: vis    BFGS ---N 14422:com.miui.cloudservice/u0a134
+  #38: psvc   PER  LCMN 4022:com.google.android.providers.media.module/u0a234
+  #37: svc    SVC  ---- 13435:com.xiaomi.bluetooth/1002
+  #36: vis    IMPF ---- 8479:com.miui.analytics/u0a119
+  #35: svc    SVC  ---- 13415:com.qualcomm.telephony/u0a213
+  #34: svcb   SVC  ---- 13040:com.qti.diagservices/1000
+  #33: vis    TRNB ---- 9432:com.miui.msa.global/u0a99
+  #32: vis    BFGS ---N 24056:com.miui.aod/1000
+  #31: fg     BFGS ---N 10344:com.android.systemui/1000
+  #30: svcb   SVC  ---- 11486:com.miui.core/u0a126
+  #29: svcb   SVC  ---- 27217:com.facebook.services/u0a73
+  #28: vis    IMPF ---- 9338:com.google.android.permissioncontroller/u0a228
+  #27: cch+15 SVC  ---- 27555:com.xiaomi.mi_connect_service/1000
+  #26: vis    IMPF ---- 13581:com.google.android.tts/u0a194
+  #25: vis    BFGS LCMN 10078:com.miui.miwallpaper/u0a115
+  #24: vis    BFGS LCMN 14009:com.google.android.ext.services/u0a231
+  #23: vis    IMPF ---- 12712:com.android.smspush/u0a220
+  #22: prcp   BFGS ---N 11251:com.google.android.apps.messaging:rcs/u0a174
+  #21: hvy    SVC  ---- 5827:com.xiaomi.joyose/1000
+  #20: prcp   TRNB ---- 5608:com.lbe.security.miui/u0a68
+  #19: pers   PER  LCMN 4257:com.miui.face/1000
+  #18: pers   PER  LCMN 4244:com.qualcomm.qti.services.secureui:sui_service/1000
+  #17: pers   PER  LCMN 4221:com.qualcomm.location/u0a204
+  #16: pers   PER  LCMN 4213:org.mipay.android.manager/u0a151
+  #15: pers   PER  LCMN 4192:com.tencent.soter.soterserver/u0a147
+  #14: pers   PER  LCMN 4177:com.qualcomm.qti.workloadclassifier/u0a222
+  #13: pers   PER  LCMN 4154:com.xiaomi.xmsfkeeper/u0a122
+  #12: pers   PER  LCMN 4142:org.ifaa.aidl.manager/u0a152
+  #11: pers   PER  LCMN 4120:com.qualcomm.qti.services.systemhelper:systemhelper_service/u0a201
+  #10: pers   PER  LCMN 4103:system/u0a51
+  # 9: pers   PER  LCMN 4083:com.miui.daemon/1000
+  # 8: pers   PER  LCMN 2803:com.android.phone/1001
+  # 7: pers   PER  LCMN 2788:com.xiaomi.finddevice/6110
+  # 6: pers   PER  LCMN 2781:com.android.se/1068
+  # 5: pers   PER  LCMN 2757:com.qti.phone/u0a187
+  # 4: pers   PER  LCMN 2761:org.codeaurora.ims/u0a200
+  # 3: pers   PER  LCMN 2741:.qtidataservices/u0a148
+  # 2: pers   PER  LCMN 2701:.dataservices/1001
+  # 1: pers   PER  LCMN 2688:com.android.networkstack.process/1073
+  # 0: sys    PER  LCMN 1812:system/1000

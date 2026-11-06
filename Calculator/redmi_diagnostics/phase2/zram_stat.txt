@@ -1,0 +1,3 @@
+
+--- STDERR / ERROR ---
+cat: /sys/block/zram0/stat: Permission denied
